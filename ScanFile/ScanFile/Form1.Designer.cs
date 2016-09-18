@@ -1,6 +1,6 @@
 ﻿namespace ScanFile
 {
-    partial class Form1
+    partial class ScanFolder
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -55,11 +55,16 @@
             this.label8 = new System.Windows.Forms.Label();
             this.btnSavePrice = new System.Windows.Forms.Button();
             this.btnExportFile = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -83,6 +88,8 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.textBox1);
+            this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.btnSavePrice);
             this.groupBox2.Controls.Add(this.txtJiangpai);
             this.groupBox2.Controls.Add(this.label8);
@@ -115,6 +122,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.pictureBox1);
             this.groupBox4.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox4.Location = new System.Drawing.Point(968, 135);
             this.groupBox4.Name = "groupBox4";
@@ -259,7 +267,7 @@
             // 
             // txtPT
             // 
-            this.txtPT.Location = new System.Drawing.Point(515, 24);
+            this.txtPT.Location = new System.Drawing.Point(485, 24);
             this.txtPT.Name = "txtPT";
             this.txtPT.Size = new System.Drawing.Size(108, 21);
             this.txtPT.TabIndex = 24;
@@ -268,7 +276,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(438, 27);
+            this.label6.Location = new System.Drawing.Point(408, 27);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(71, 12);
             this.label6.TabIndex = 23;
@@ -276,7 +284,7 @@
             // 
             // txtDantou
             // 
-            this.txtDantou.Location = new System.Drawing.Point(713, 24);
+            this.txtDantou.Location = new System.Drawing.Point(683, 24);
             this.txtDantou.Name = "txtDantou";
             this.txtDantou.Size = new System.Drawing.Size(108, 21);
             this.txtDantou.TabIndex = 26;
@@ -285,7 +293,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(636, 27);
+            this.label7.Location = new System.Drawing.Point(606, 27);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(71, 12);
             this.label7.TabIndex = 25;
@@ -293,7 +301,7 @@
             // 
             // txtJiangpai
             // 
-            this.txtJiangpai.Location = new System.Drawing.Point(944, 24);
+            this.txtJiangpai.Location = new System.Drawing.Point(843, 24);
             this.txtJiangpai.Name = "txtJiangpai";
             this.txtJiangpai.Size = new System.Drawing.Size(108, 21);
             this.txtJiangpai.TabIndex = 28;
@@ -302,7 +310,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(909, 27);
+            this.label8.Location = new System.Drawing.Point(808, 27);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(29, 12);
             this.label8.TabIndex = 27;
@@ -310,7 +318,7 @@
             // 
             // btnSavePrice
             // 
-            this.btnSavePrice.Location = new System.Drawing.Point(1110, 13);
+            this.btnSavePrice.Location = new System.Drawing.Point(1148, 13);
             this.btnSavePrice.Name = "btnSavePrice";
             this.btnSavePrice.Size = new System.Drawing.Size(141, 40);
             this.btnSavePrice.TabIndex = 29;
@@ -328,7 +336,33 @@
             this.btnExportFile.UseVisualStyleBackColor = true;
             this.btnExportFile.Click += new System.EventHandler(this.btnExportFile_Click);
             // 
-            // Form1
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(1014, 24);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(108, 21);
+            this.textBox1.TabIndex = 31;
+            this.textBox1.Text = "38";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(979, 27);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(29, 12);
+            this.label9.TabIndex = 30;
+            this.label9.Text = "灯片";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Location = new System.Drawing.Point(3, 17);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(321, 417);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
+            // ScanFolder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -338,15 +372,17 @@
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Name = "ScanFolder";
+            this.Text = "报表导出";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -380,6 +416,9 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnExportFile;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

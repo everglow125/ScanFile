@@ -16,5 +16,16 @@ namespace ScanFile
         public string Name { get; set; }
         public string FullName { get; set; }
 
+        public double Length { get; set; }
+
+        public double Width { get; set; }
+
+        public int QTY { get; set; }
+
+        public DateTime PrintTime { get; set; }
+
+        public String Type { get; set; }
+
+        public Double UnitPrice { get; set; }
     }
 }

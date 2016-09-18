@@ -12,17 +12,20 @@ using System.Configuration;
 
 namespace ScanFile
 {
-    public partial class Form1 : Form
+    public partial class ScanFolder : Form
     {
         private double XiezhenPrice;
         private double UVPrice;
         private double PTPrice;
         private double DantouPrice;
         private double JiangpaiPrice;
-        public Form1()
+        private string floderReg = @"^\d{1,2}\.\d{1,2}$";
+        public ScanFolder()
         {
             InitializeComponent();
             CheckAuthentication();
+            InitTextBox();
+
         }
         /// <summary>
         /// 验证MAC地址是否已授权 未授权则提示并关闭程序
@@ -44,6 +47,14 @@ namespace ScanFile
                 }
                 System.Environment.Exit(0);
             }
+        }
+
+        private void InitTextBox()
+        {
+            this.txtYear.Text = DateTime.Now.Year.ToString();
+            // this.pictureBox1.BackgroundImage = Image
+            pictureBox1.Load("F://20140212231935_kaxFE.thumb.600_0.png");
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
         }
 
         private void InitPrince()
@@ -98,7 +109,11 @@ namespace ScanFile
                 string fullName = folder + "\\" + file.Name;
                 var existsItem = fileList.Where(x => x.FullName == fullName).ToList();
                 if (existsItem != null && existsItem.Count > 0) continue;
-                fileList.Add(new TFile(file.Name, fullName));
+                var item = new TFile(file.Name, fullName);
+                string tempName = file.Name.Trim().ToUpper();
+                item.Type = GetPrintType(tempName);
+                item.UnitPrice = GetUnitPrice(item.Type);
+                fileList.Add(item);
             }
             if (this.cbxChild.Checked)
             {
@@ -120,6 +135,51 @@ namespace ScanFile
         private void btnExportFile_Click(object sender, EventArgs e)
         {
 
+        }
+
+
+
+        private double GetUnitPrice(string printType)
+        {
+            double unitPrice = 0;
+            switch (printType)
+            {
+                case "写真": unitPrice = XiezhenPrice; break;
+                case "UV": unitPrice = UVPrice; break;
+                case "PT板": unitPrice = PTPrice; break;
+                case "奖牌": unitPrice = JiangpaiPrice; break;
+                case "灯片": unitPrice = 0; break;
+                case "单透": unitPrice = DantouPrice; break;
+            }
+            return unitPrice;
+
+        }
+
+
+        private string GetPrintType(string fileName)
+        {
+            fileName = fileName.ToUpper().Trim();
+            if (fileName.Contains("灯片"))
+            {
+                return "灯片";
+            }
+            if (fileName.Contains("UV"))
+            {
+                return "UV";
+            }
+            if (fileName.Contains("PT板"))
+            {
+                return "PT板";
+            }
+            if (fileName.Contains("奖牌"))
+            {
+                return "奖牌";
+            }
+            if (fileName.Contains("单透"))
+            {
+                return "单透";
+            }
+            return "写真";
         }
     }
 }

@@ -2,8 +2,8 @@ E:\ScanFile\ScanFile\ScanFile\bin\Debug\ScanFile.exe.config
 E:\ScanFile\ScanFile\ScanFile\bin\Debug\ScanFile.exe
 E:\ScanFile\ScanFile\ScanFile\bin\Debug\ScanFile.pdb
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.csprojResolveAssemblyReference.cache
-E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.Form1.resources
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.Properties.Resources.resources
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.csproj.GenerateResource.Cache
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.exe
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.pdb
+E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.ScanFolder.resources
