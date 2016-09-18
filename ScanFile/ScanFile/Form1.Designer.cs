@@ -39,7 +39,7 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.txtDengpian = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.btnSavePrice = new System.Windows.Forms.Button();
             this.txtJiangpai = new System.Windows.Forms.TextBox();
@@ -167,7 +167,7 @@
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.textBox1);
+            this.groupBox2.Controls.Add(this.txtDengpian);
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.btnSavePrice);
             this.groupBox2.Controls.Add(this.txtJiangpai);
@@ -188,13 +188,13 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "价格设置";
             // 
-            // textBox1
+            // txtDengpian
             // 
-            this.textBox1.Location = new System.Drawing.Point(1014, 24);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(108, 21);
-            this.textBox1.TabIndex = 31;
-            this.textBox1.Text = "38";
+            this.txtDengpian.Location = new System.Drawing.Point(1014, 24);
+            this.txtDengpian.Name = "txtDengpian";
+            this.txtDengpian.Size = new System.Drawing.Size(108, 21);
+            this.txtDengpian.TabIndex = 31;
+            this.txtDengpian.Text = "38";
             // 
             // label9
             // 
@@ -362,6 +362,7 @@
             this.dataGridView1.RowTemplate.Height = 23;
             this.dataGridView1.Size = new System.Drawing.Size(962, 417);
             this.dataGridView1.TabIndex = 0;
+            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             // 
             // ScanFolder
             // 
@@ -417,7 +418,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnExportFile;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox txtDengpian;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.PictureBox pictureBox1;
     }

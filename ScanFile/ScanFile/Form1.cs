@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace ScanFile
 {
@@ -25,6 +26,7 @@ namespace ScanFile
         private Regex qtyReg = new Regex(@"(?<QTY>([一二三四五六七八九十百千零]|\d)+)[张|块]");
         private DateTime currentDate;
         private DataTable fileList;
+        private double DengpianPrice;
 
         private double[] MatchLength(string fileName)
         {
@@ -100,6 +102,7 @@ namespace ScanFile
             KTPrice = Convert.ToDouble(this.txtKT.Text.Trim());
             DantouPrice = Convert.ToDouble(this.txtDantou.Text.Trim());
             JiangpaiPrice = Convert.ToDouble(this.txtJiangpai.Text.Trim());
+            DengpianPrice = Convert.ToDouble(this.txtDengpian.Text.Trim());
         }
         private void btnSelectPath_Click(object sender, EventArgs e)
         {
@@ -131,7 +134,10 @@ namespace ScanFile
 
         private void BindFileList()
         {
-            this.dataGridView1.DataSource = fileList;
+            DataView dv = fileList.DefaultView;
+            dv.Sort = "时间 Asc";
+            this.dataGridView1.DataSource = dv.ToTable();
+
         }
 
         private void ScanFile(string folder)
@@ -145,6 +151,7 @@ namespace ScanFile
                 string fullName = folder + "\\" + file.Name;
                 DataRow dr = fileList.NewRow();
                 dr["文件名"] = file.Name.Trim().ToUpper();
+                dr["完全路径"] = fullName;
                 dr["时间"] = currentDate.ToString("yyyy-MM-dd");
                 dr["类型"] = GetPrintType(dr["文件名"].ToString());
                 var price = GetUnitPrice(dr["类型"].ToString());
@@ -184,6 +191,7 @@ namespace ScanFile
             this.dataGridView1.DataSource = null;
             InitPrince();
             ImportFolder();
+            dataGridView1.Columns["完全路径"].Visible = false;
         }
 
         private void btnSavePrice_Click(object sender, EventArgs e)
@@ -252,6 +260,7 @@ namespace ScanFile
             result.Columns.Add("数量");
             result.Columns.Add("单价");
             result.Columns.Add("总价");
+            result.Columns.Add("完全路径");
             return result;
         }
 
@@ -326,6 +335,21 @@ namespace ScanFile
 
                     }
             }
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+            var filePath = dataGridView1.Rows[e.RowIndex].Cells["完全路径"].Value.ToString();
+            OpenFileDir(filePath);
+        }
+
+        private void OpenFileDir(string filePath)
+        {
+            Process open = new Process();
+            open.StartInfo.FileName = "explorer";
+            open.StartInfo.Arguments = @"/select," + filePath;
+            open.Start();
         }
 
     }
