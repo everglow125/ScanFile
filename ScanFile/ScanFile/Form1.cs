@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace ScanFile
 {
@@ -16,15 +17,50 @@ namespace ScanFile
     {
         private double XiezhenPrice;
         private double UVPrice;
-        private double PTPrice;
+        private double KTPrice;
         private double DantouPrice;
         private double JiangpaiPrice;
-        private string floderReg = @"^\d{1,2}\.\d{1,2}$";
+        private Regex floderReg = new Regex(@"^\d{1,2}\.\d{1,2}$");
+        private Regex lengthReg1 = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})");
+        private Regex qtyReg = new Regex(@"(?<QTY>([一二三四五六七八九十百千零]|\d)+)[张|块]");
+        private DateTime currentDate;
+        private DataTable fileList;
+
+        private double[] MatchLength(string fileName)
+        {
+
+            double[] result = { 0, 0 };
+            var temp = lengthReg1.Matches(fileName);
+            if (temp == null || temp.Count == 0) return result;
+            foreach (Match match in temp)
+            {
+                GroupCollection gc = match.Groups;
+                result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
+                result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+            }
+            return result;
+        }
+
+
+        private int MatchQTY(string fileName)
+        {
+
+            int qty = 1;
+            var temp = qtyReg.Matches(fileName);
+            if (temp == null || temp.Count == 0) return qty;
+            foreach (Match match in temp)
+            {
+                GroupCollection gc = match.Groups;
+                qty = ConvertNum(gc["QTY"].Value);
+            }
+            return qty;
+        }
         public ScanFolder()
         {
             InitializeComponent();
             CheckAuthentication();
             InitTextBox();
+            fileList = CreateTable();
 
         }
         /// <summary>
@@ -61,12 +97,10 @@ namespace ScanFile
         {
             XiezhenPrice = Convert.ToDouble(this.txtXiezhen.Text.Trim());
             UVPrice = Convert.ToDouble(this.txtUV.Text.Trim());
-            PTPrice = Convert.ToDouble(this.txtPT.Text.Trim());
+            KTPrice = Convert.ToDouble(this.txtKT.Text.Trim());
             DantouPrice = Convert.ToDouble(this.txtDantou.Text.Trim());
             JiangpaiPrice = Convert.ToDouble(this.txtJiangpai.Text.Trim());
         }
-
-        public List<TFile> fileList = new List<TFile>();
         private void btnSelectPath_Click(object sender, EventArgs e)
         {
             try
@@ -83,6 +117,8 @@ namespace ScanFile
         public void ImportFolder()
         {
             string folder = this.txtAddress.Text.Trim();
+            ScanBind(folder);
+            return;
             Action<string> ac = new Action<string>(ScanBind);
             ac.BeginInvoke(folder, null, null);
         }
@@ -95,9 +131,7 @@ namespace ScanFile
 
         private void BindFileList()
         {
-            BindingSource bs = new BindingSource();
-            bs.DataSource = fileList;
-            this.dataGridView1.DataSource = bs;
+            this.dataGridView1.DataSource = fileList;
         }
 
         private void ScanFile(string folder)
@@ -106,24 +140,49 @@ namespace ScanFile
             if (directory == null || !directory.Exists) return;
             foreach (FileInfo file in directory.GetFiles())
             {
+                if (!file.Name.Trim().ToUpper().EndsWith("JPG"))
+                    continue;
                 string fullName = folder + "\\" + file.Name;
-                var existsItem = fileList.Where(x => x.FullName == fullName).ToList();
-                if (existsItem != null && existsItem.Count > 0) continue;
-                var item = new TFile(file.Name, fullName);
-                string tempName = file.Name.Trim().ToUpper();
-                item.Type = GetPrintType(tempName);
-                item.UnitPrice = GetUnitPrice(item.Type);
-                fileList.Add(item);
+                DataRow dr = fileList.NewRow();
+                dr["文件名"] = file.Name.Trim().ToUpper();
+                dr["时间"] = currentDate.ToString("yyyy-MM-dd");
+                dr["类型"] = GetPrintType(dr["文件名"].ToString());
+                var price = GetUnitPrice(dr["类型"].ToString());
+                dr["单价"] = price;
+                var ld = MatchLength(dr["文件名"].ToString());
+                dr["长度"] = (ld[0] / 100).ToString();
+                dr["宽度"] = (ld[1] / 100).ToString();
+                var size = ((ld[0] / 100) * (ld[1] / 100));
+                dr["面积"] = size.ToString();
+                var qty = MatchQTY(dr["文件名"].ToString());
+                dr["数量"] = qty.ToString();
+                dr["总价"] = GetTotalAmount(qty, price, size, dr["类型"].ToString());
+                fileList.Rows.Add(dr);
             }
             if (this.cbxChild.Checked)
             {
                 foreach (DirectoryInfo folderItem in directory.GetDirectories())
+                {
+                    if (floderReg.IsMatch(folderItem.Name))
+                        currentDate = Convert.ToDateTime(this.txtYear.Text.Trim() + "-" + folderItem.Name.Replace(".", "-"));
                     ScanFile(folder + "\\" + folderItem.Name);
+                }
             }
+        }
+
+        private double GetTotalAmount(int qty, double price, double size, string type)
+        {
+            if (type == "奖牌")
+            {
+                return qty * price;
+            }
+            return qty * price * size;
         }
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
+            this.dataGridView1.DataSource = null;
+            InitPrince();
             ImportFolder();
         }
 
@@ -146,7 +205,7 @@ namespace ScanFile
             {
                 case "写真": unitPrice = XiezhenPrice; break;
                 case "UV": unitPrice = UVPrice; break;
-                case "PT板": unitPrice = PTPrice; break;
+                case "KT板": unitPrice = KTPrice; break;
                 case "奖牌": unitPrice = JiangpaiPrice; break;
                 case "灯片": unitPrice = 0; break;
                 case "单透": unitPrice = DantouPrice; break;
@@ -158,7 +217,6 @@ namespace ScanFile
 
         private string GetPrintType(string fileName)
         {
-            fileName = fileName.ToUpper().Trim();
             if (fileName.Contains("灯片"))
             {
                 return "灯片";
@@ -167,9 +225,9 @@ namespace ScanFile
             {
                 return "UV";
             }
-            if (fileName.Contains("PT板"))
+            if (fileName.Contains("KT板"))
             {
-                return "PT板";
+                return "KT板";
             }
             if (fileName.Contains("奖牌"))
             {
@@ -181,5 +239,94 @@ namespace ScanFile
             }
             return "写真";
         }
+
+        private DataTable CreateTable()
+        {
+            DataTable result = new DataTable();
+            result.Columns.Add("时间");
+            result.Columns.Add("文件名");
+            result.Columns.Add("长度");
+            result.Columns.Add("宽度");
+            result.Columns.Add("面积");
+            result.Columns.Add("类型");
+            result.Columns.Add("数量");
+            result.Columns.Add("单价");
+            result.Columns.Add("总价");
+            return result;
+        }
+
+        private int ConvertNum(string num)
+        {
+            if (num.Contains("百"))
+            {
+                string[] baifen = num.Split('百');
+                return switchNum(baifen[0]) * 100 + ConvertNum(baifen[1]);
+            }
+            if (num.Contains("十") && num.Length > 1)
+            {
+                string[] shifen = num.Split('十');
+                return switchNum(shifen[0]) * 10 + switchNum(shifen[1]);
+            }
+            return switchNum(num);
+
+        }
+
+        private int switchNum(string n)
+        {
+            switch (n)
+            {
+                case "零":
+                    {
+                        return 0;
+                    }
+                case "一":
+                    {
+                        return 1;
+                    }
+                case "二":
+                    {
+                        return 2;
+                    }
+                case "三":
+                    {
+                        return 3;
+                    }
+                case "四":
+                    {
+                        return 4;
+                    }
+                case "五":
+                    {
+                        return 5;
+                    }
+                case "六":
+                    {
+                        return 6;
+                    }
+                case "七":
+                    {
+                        return 7;
+                    }
+                case "八":
+                    {
+                        return 8;
+                    }
+                case "九":
+                    {
+                        return 9;
+                    }
+                case "": return 0;
+                default:
+                    {
+                        try { return Convert.ToInt32(n); }
+                        catch
+                        {
+                            return 1;
+                        }
+
+                    }
+            }
+        }
+
     }
 }
