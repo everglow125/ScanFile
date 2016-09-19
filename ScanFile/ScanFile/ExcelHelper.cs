@@ -367,6 +367,7 @@ public static class ExcelHelper
         IRow countRow = sheet.CreateRow(rowIndex);
         var tt = countRow.CreateCell(8);
         tt.SetCellFormula(string.Format("SUM(I2:I{0})", rowIndex));
+        sheet.CreateFreezePane(0, 1, 0, 1);
         FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         workbook.Write(fs);
         fs.Dispose();
