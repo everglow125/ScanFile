@@ -7,3 +7,13 @@ E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.csproj.GenerateResource.Cache
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.exe
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.pdb
 E:\ScanFile\ScanFile\ScanFile\obj\Debug\ScanFile.ScanFolder.resources
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\Newtonsoft.Json.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.OOXML.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.OpenXml4Net.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.OpenXmlFormats.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\Newtonsoft.Json.xml
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.xml
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.OOXML.xml
+E:\ScanFile\ScanFile\ScanFile\bin\Debug\NPOI.OpenXml4Net.xml

@@ -22,23 +22,100 @@ namespace ScanFile
         private double DantouPrice;
         private double JiangpaiPrice;
         private Regex floderReg = new Regex(@"^\d{1,2}\.\d{1,2}$");
-        private Regex lengthReg1 = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})");
+
+        private Regex noUnitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})");
+        private Regex hasUnitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[CM|M|米]*[ X×-]+([长|宽|高]){0,1}(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})(?<Unit>[M|CM|米]+)");
+        private Regex has3SplitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<flag>\d{1,5}((\.|[点])\d{1,3}){0,1})[^张]");
+
         private Regex qtyReg = new Regex(@"(?<QTY>([一二三四五六七八九十百千零]|\d)+)[张|块]");
         private DateTime currentDate;
         private DataTable fileList;
         private double DengpianPrice;
 
-        private double[] MatchLength(string fileName)
-        {
 
-            double[] result = { 0, 0 };
-            var temp = lengthReg1.Matches(fileName);
-            if (temp == null || temp.Count == 0) return result;
-            foreach (Match match in temp)
+        private bool MatchNoUnitLength(string source, ref double[] result)
+        {
+            var matchs = noUnitReg.Matches(source);
+            if (matchs == null || matchs.Count == 0)
+                return false;
+            foreach (Match match in matchs)
             {
                 GroupCollection gc = match.Groups;
                 result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
                 result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+                if (result[0] < 4)
+                {
+                    result[0] = result[0] * 100;
+                    result[1] = result[1] * 100;
+                }
+            }
+            return true;
+        }
+
+        private bool MatchUnitLength(string source, ref double[] result)
+        {
+            var matchs = hasUnitReg.Matches(source);
+            if (matchs == null || matchs.Count == 0)
+                return false;
+            foreach (Match match in matchs)
+            {
+                GroupCollection gc = match.Groups;
+                result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
+                result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+                string unit = gc["Unit"].Value;
+                if (unit != "CM")
+                {
+                    result[0] = result[0] * 100;
+                    result[1] = result[1] * 100;
+                }
+            }
+            return true;
+        }
+
+        private bool Match3Split(string source, ref double[] result)
+        {
+            var matchs = has3SplitReg.Matches(source);
+            if (matchs == null || matchs.Count == 0)
+                return false;
+            foreach (Match match in matchs)
+            {
+                GroupCollection gc = match.Groups;
+                double flag1, flag2, flag3;
+                flag1 = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
+                flag2 = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+                flag3 = Convert.ToDouble(gc["flag"].Value.Replace("点", "."));
+
+                if (flag1 < flag3)
+                {
+                    result[0] = flag2;
+                    result[1] = flag3;
+                }
+                else
+                {
+                    result[0] = flag1;
+                    result[1] = flag2;
+                }
+                if (result[0] < 3)
+                {
+                    result[0] = result[0] * 100;
+                    result[1] = result[1] * 100;
+                }
+            }
+            return true;
+        }
+
+        private double[] MatchLength(string fileName)
+        {
+            double[] result = { 0, 0 };
+            if (!MatchUnitLength(fileName, ref result))
+            {
+                if (!Match3Split(fileName, ref  result))
+                {
+                    if (!MatchNoUnitLength(fileName, ref  result))
+                    {
+                        return result;
+                    }
+                }
             }
             return result;
         }
@@ -201,6 +278,10 @@ namespace ScanFile
 
         private void btnExportFile_Click(object sender, EventArgs e)
         {
+            DataTable dt = (dataGridView1.DataSource as DataTable);
+           
+
+            ExcelHelper.ExportToExcel(dt);
 
         }
 
@@ -266,15 +347,30 @@ namespace ScanFile
 
         private int ConvertNum(string num)
         {
+            if (num.Contains("亿"))
+            {
+                string[] qianfen = num.Split('亿');
+                return ConvertNum(qianfen[0]) * 100000000 + ConvertNum(qianfen[1]);
+            }
+            if (num.Contains("万"))
+            {
+                string[] qianfen = num.Split('万');
+                return ConvertNum(qianfen[0]) * 10000 + ConvertNum(qianfen[1]);
+            }
+            if (num.Contains("千"))
+            {
+                string[] qianfen = num.Split('千');
+                return ConvertNum(qianfen[0]) * 1000 + ConvertNum(qianfen[1]);
+            }
             if (num.Contains("百"))
             {
                 string[] baifen = num.Split('百');
-                return switchNum(baifen[0]) * 100 + ConvertNum(baifen[1]);
+                return ConvertNum(baifen[0]) * 100 + ConvertNum(baifen[1]);
             }
             if (num.Contains("十") && num.Length > 1)
             {
                 string[] shifen = num.Split('十');
-                return switchNum(shifen[0]) * 10 + switchNum(shifen[1]);
+                return ConvertNum(shifen[0]) * 10 + switchNum(shifen[1].Replace("零", ""));
             }
             return switchNum(num);
 
@@ -350,6 +446,23 @@ namespace ScanFile
             open.StartInfo.FileName = "explorer";
             open.StartInfo.Arguments = @"/select," + filePath;
             open.Start();
+        }
+
+
+        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                var index = e.RowIndex;
+                dataGridView1.Rows[index].Cells["面积"].Value = Convert.ToDouble(dataGridView1.Rows[index].Cells["长度"].Value) * Convert.ToDouble(dataGridView1.Rows[index].Cells["宽度"].Value);
+                dataGridView1.Rows[index].Cells["总价"].Value = (dataGridView1.Rows[index].Cells["类型"].Value.ToString() == "奖牌" ? 1 : Convert.ToDouble(dataGridView1.Rows[index].Cells["面积"].Value))
+                    * Convert.ToDouble(dataGridView1.Rows[index].Cells["单价"].Value)
+                    * Convert.ToDouble(dataGridView1.Rows[index].Cells["数量"].Value);
+            }
+            catch
+            {
+                MessageBox.Show("程序异常：是否输入错误数值");
+            }
         }
 
     }

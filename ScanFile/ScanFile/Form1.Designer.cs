@@ -41,7 +41,6 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtDengpian = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
-            this.btnSavePrice = new System.Windows.Forms.Button();
             this.txtJiangpai = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.txtDantou = new System.Windows.Forms.TextBox();
@@ -121,6 +120,8 @@
             // cbxChild
             // 
             this.cbxChild.AutoSize = true;
+            this.cbxChild.Checked = true;
+            this.cbxChild.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbxChild.Location = new System.Drawing.Point(394, 32);
             this.cbxChild.Name = "cbxChild";
             this.cbxChild.Size = new System.Drawing.Size(96, 16);
@@ -169,7 +170,6 @@
             // 
             this.groupBox2.Controls.Add(this.txtDengpian);
             this.groupBox2.Controls.Add(this.label9);
-            this.groupBox2.Controls.Add(this.btnSavePrice);
             this.groupBox2.Controls.Add(this.txtJiangpai);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.txtDantou);
@@ -204,16 +204,6 @@
             this.label9.Size = new System.Drawing.Size(29, 12);
             this.label9.TabIndex = 30;
             this.label9.Text = "灯片";
-            // 
-            // btnSavePrice
-            // 
-            this.btnSavePrice.Location = new System.Drawing.Point(1148, 13);
-            this.btnSavePrice.Name = "btnSavePrice";
-            this.btnSavePrice.Size = new System.Drawing.Size(141, 40);
-            this.btnSavePrice.TabIndex = 29;
-            this.btnSavePrice.Text = "保存价格";
-            this.btnSavePrice.UseVisualStyleBackColor = true;
-            this.btnSavePrice.Click += new System.EventHandler(this.btnSavePrice_Click);
             // 
             // txtJiangpai
             // 
@@ -363,6 +353,7 @@
             this.dataGridView1.Size = new System.Drawing.Size(962, 417);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
+            this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
             // ScanFolder
             // 
@@ -405,7 +396,6 @@
         private System.Windows.Forms.TextBox txtAddress;
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnSavePrice;
         private System.Windows.Forms.TextBox txtJiangpai;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox txtDantou;
