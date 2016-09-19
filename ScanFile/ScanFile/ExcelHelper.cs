@@ -18,6 +18,7 @@ using NPOI.SS.UserModel;
 using System.Web;
 using NPOI.XSSF.UserModel;
 using System.Windows.Forms;
+using NPOI.SS.Util;
 
 public static class ExcelHelper
 {
@@ -28,10 +29,11 @@ public static class ExcelHelper
     /// 获取要保存的文件名称（含完整路径）
     /// </summary>
     /// <returns></returns>
-    public static string GetSaveFilePath()
+    public static string GetSaveFilePath(string fileName = "")
     {
         SaveFileDialog saveFileDig = new SaveFileDialog();
         saveFileDig.Filter = "Excel Office97-2003(*.xls)|*.xls|Excel Office2007及以上(*.xlsx)|*.xlsx";
+        saveFileDig.FileName = fileName;
         saveFileDig.FilterIndex = 0;
         saveFileDig.Title = "导出到";
         saveFileDig.OverwritePrompt = true;
@@ -124,6 +126,12 @@ public static class ExcelHelper
         ICellStyle style = workbook.CreateCellStyle();
         style.FillPattern = FillPattern.SolidForeground;
         style.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+        style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
 
         return style;
     }
@@ -261,16 +269,35 @@ public static class ExcelHelper
 
         ISheet sheet = workbook.CreateSheet(sheetName);
         IRow headerRow = sheet.CreateRow(0);
+        ICellStyle style = workbook.CreateCellStyle();
+        style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
+        ICellStyle styleleft = workbook.CreateCellStyle();
+        styleleft.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleleft.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleleft.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleleft.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleleft.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Left;
+        styleleft.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
         // handling header.
         foreach (DataColumn column in sourceTable.Columns)
         {
+            // if (column.ColumnName == "完全路径") continue;
             ICell headerCell = headerRow.CreateCell(column.Ordinal);
             headerCell.SetCellValue(column.ColumnName);
             headerCell.CellStyle = cellStyle;
+
         }
 
         // handling value.
         int rowIndex = 1;
+        int margenIndex = 1;
+        int margenCount = 0;
+        string currentDate = sourceTable.Rows[0][0].ToString();
 
         foreach (DataRow row in sourceTable.Rows)
         {
@@ -278,11 +305,68 @@ public static class ExcelHelper
 
             foreach (DataColumn column in sourceTable.Columns)
             {
-                dataRow.CreateCell(column.Ordinal).SetCellValue((row[column] ?? "").ToString());
+
+                var temp = dataRow.CreateCell(column.Ordinal);
+                if (column.ColumnName == "长度" || column.ColumnName == "宽度" || column.ColumnName == "面积" || column.ColumnName == "单价" || column.ColumnName == "总价" || column.ColumnName == "数量")
+                {
+                    temp.SetCellValue(Convert.ToDouble(row[column]));
+                    temp.SetCellType(CellType.Numeric);
+                    if (column.ColumnName == "面积")
+                    {
+                        temp.SetCellFormula(string.Format("C{0}*D{0}", rowIndex + 1));
+                    }
+                    if (column.ColumnName == "总价")
+                    {
+                        if (row["类型"].ToString() != "奖牌")
+                            temp.SetCellFormula(string.Format("E{0}*H{0}*G{0}", rowIndex + 1));
+                        else
+                            temp.SetCellFormula(string.Format("H{0}*G{0}", rowIndex + 1));
+                    }
+
+                }
+                else
+                {
+                    temp.SetCellValue((row[column] ?? "").ToString());
+                }
+                temp.CellStyle = column.ColumnName != "文件名" ? style : styleleft;
+                if (column.ColumnName == "完全路径")
+                {
+                    //创建一个超链接对象
+                    IHyperlink link = new HSSFHyperlink(HyperlinkType.Url);
+                    // strTableName 这个参数为 sheet名字 A1 为单元格 其他是固定格式
+                    link.Address = row[column].ToString();
+                    temp.Hyperlink = link;
+                    temp.SetCellValue("打开文件");
+                }
             }
 
+
+            if (rowIndex > 1)
+            {
+                string rowDate = sourceTable.Rows[rowIndex - 1]["时间"].ToString();
+                if (rowDate == currentDate)
+                {
+                    margenCount++;
+                }
+                else
+                {
+                    currentDate = rowDate;
+                    sheet.AddMergedRegion(new CellRangeAddress(margenIndex, margenIndex + margenCount, 0, 0));
+                    //合并之前单元格
+                    margenIndex = rowIndex;
+                    margenCount = 0;
+                }
+            }
             rowIndex++;
         }
+        for (int i = 0; i < sourceTable.Rows.Count - 1; i++)
+        {
+            if (i == 1) sheet.SetColumnWidth(i, 25 * 256); else sheet.SetColumnWidth(i, 256 * 12);
+            //sheet.AutoSizeColumn(i, true);
+        }
+        IRow countRow = sheet.CreateRow(rowIndex);
+        var tt = countRow.CreateCell(8);
+        tt.SetCellFormula(string.Format("SUM(I2:I{0})", rowIndex));
         FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         workbook.Write(fs);
         fs.Dispose();

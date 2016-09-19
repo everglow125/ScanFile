@@ -145,7 +145,7 @@
             this.txtAddress.Name = "txtAddress";
             this.txtAddress.Size = new System.Drawing.Size(216, 21);
             this.txtAddress.TabIndex = 14;
-            this.txtAddress.Text = "D:\\320";
+            this.txtAddress.Text = "D:\\荆维UV\\16年精工";
             // 
             // btnOpen
             // 

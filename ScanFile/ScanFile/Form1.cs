@@ -24,10 +24,10 @@ namespace ScanFile
         private Regex floderReg = new Regex(@"^\d{1,2}\.\d{1,2}$");
 
         private Regex noUnitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})");
-        private Regex hasUnitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[CM|M|米]*[ X×-]+([长|宽|高]){0,1}(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})(?<Unit>[M|CM|米]+)");
-        private Regex has3SplitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<flag>\d{1,5}((\.|[点])\d{1,3}){0,1})[^张]");
+        private Regex hasUnitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})(CM|[|M|米])*[ X×-]+([长|宽|高]){0,1}(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})(?<Unit>(CM|[|M|米])+)");
+        private Regex has3SplitReg = new Regex(@"(?<length>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<width>\d{1,5}((\.|[点])\d{1,3}){0,1})[ X×-]+(?<flag>\d{1,5}((\.|[点])\d{1,3}){0,1})[^\d张块份]");
 
-        private Regex qtyReg = new Regex(@"(?<QTY>([一二三四五六七八九十百千零]|\d)+)[张|块]");
+        private Regex qtyReg = new Regex(@"(?<QTY>([一二三四五六七八九十百千零]|\d)+)[张|块|份]");
         private DateTime currentDate;
         private DataTable fileList;
         private double DengpianPrice;
@@ -67,6 +67,11 @@ namespace ScanFile
                 {
                     result[0] = result[0] * 100;
                     result[1] = result[1] * 100;
+                }
+                if (unit == "MM")
+                {
+                    result[0] = result[0] / 1000;
+                    result[1] = result[1] / 1000;
                 }
             }
             return true;
@@ -265,10 +270,17 @@ namespace ScanFile
 
         private void btnOpen_Click(object sender, EventArgs e)
         {
-            this.dataGridView1.DataSource = null;
-            InitPrince();
-            ImportFolder();
-            dataGridView1.Columns["完全路径"].Visible = false;
+            try
+            {
+                this.fileList.Clear();
+                InitPrince();
+                ImportFolder();
+                dataGridView1.Columns["完全路径"].Visible = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void btnSavePrice_Click(object sender, EventArgs e)
@@ -278,11 +290,19 @@ namespace ScanFile
 
         private void btnExportFile_Click(object sender, EventArgs e)
         {
-            DataTable dt = (dataGridView1.DataSource as DataTable);
-           
-
-            ExcelHelper.ExportToExcel(dt);
-
+            try
+            {
+                DataTable dt = (dataGridView1.DataSource as DataTable);
+                string defaultname = this.txtCustomer.Text.Trim() + this.txtYear.Text.Trim() + ".xls";
+                string savePaht = ExcelHelper.GetSaveFilePath(defaultname);
+                string sheet = this.txtCustomer.Text.Trim() == "" ? this.txtYear.Text.Trim() : this.txtCustomer.Text.Trim();
+                ExcelHelper.ExportToExcel(dt, sheet, savePaht);
+                OpenFileDir(savePaht);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
@@ -435,9 +455,15 @@ namespace ScanFile
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-
-            var filePath = dataGridView1.Rows[e.RowIndex].Cells["完全路径"].Value.ToString();
-            OpenFileDir(filePath);
+            try
+            {
+                var filePath = dataGridView1.Rows[e.RowIndex].Cells["完全路径"].Value.ToString();
+                OpenFileDir(filePath);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private void OpenFileDir(string filePath)
