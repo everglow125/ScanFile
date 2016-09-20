@@ -224,7 +224,7 @@ namespace ScanFile
             {
                 return "UV";
             }
-            if (fileName.Contains("KT板"))
+            if (fileName.Contains("KT"))
             {
                 return "KT板";
             }
