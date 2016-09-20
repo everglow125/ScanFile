@@ -27,33 +27,40 @@ namespace ScanFile
 
         public static int ToNumber(this string source)
         {
-            source.TrimStart('零');
-            if (source.Contains("亿"))
+            try
             {
-                string[] numbers = source.Split('亿');
-                return numbers[0].ToNumber() * 100000000 + numbers[1].ToNumber();
+                source.TrimStart('零');
+                if (source.Contains("亿"))
+                {
+                    string[] numbers = source.Split('亿');
+                    return numbers[0].ToNumber() * 100000000 + numbers[1].ToNumber();
+                }
+                if (source.Contains("万"))
+                {
+                    string[] numbers = source.Split('万');
+                    return numbers[0].ToNumber() * 10000 + numbers[1].ToNumber();
+                }
+                if (source.Contains("千"))
+                {
+                    string[] numbers = source.Split('千');
+                    return numbers[0].ToNumber() * 1000 + numbers[1].ToNumber();
+                }
+                if (source.Contains("百"))
+                {
+                    string[] numbers = source.Split('百');
+                    return numbers[0].ToNumber() * 100 + numbers[1].ToNumber();
+                }
+                if (source.Contains("十") && source.Length > 1)
+                {
+                    string[] numbers = source.Split('十');
+                    return numbers[0].ToNumber() * 10 + numbers[1].ToNumber();
+                }
+                return ConvertToNumber(source);
             }
-            if (source.Contains("万"))
+            catch
             {
-                string[] numbers = source.Split('万');
-                return numbers[0].ToNumber() * 10000 + numbers[1].ToNumber();
+                return -1;
             }
-            if (source.Contains("千"))
-            {
-                string[] numbers = source.Split('千');
-                return numbers[0].ToNumber() * 1000 + numbers[1].ToNumber();
-            }
-            if (source.Contains("百"))
-            {
-                string[] numbers = source.Split('百');
-                return numbers[0].ToNumber() * 100 + numbers[1].ToNumber();
-            }
-            if (source.Contains("十") && source.Length > 1)
-            {
-                string[] numbers = source.Split('十');
-                return numbers[0].ToNumber() * 10 + numbers[1].ToNumber();
-            }
-            return ConvertToNumber(source);
         }
 
         private static string ReplaceQuanjiao(string source)
