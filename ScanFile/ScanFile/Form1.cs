@@ -70,13 +70,17 @@ namespace ScanFile
             JiangpaiPrice = Convert.ToDouble(this.txtJiangpai.Text.Trim());
             DengpianPrice = Convert.ToDouble(this.txtDengpian.Text.Trim());
         }
+        static string lastpath = "";
         private void btnSelectPath_Click(object sender, EventArgs e)
         {
             try
             {
                 FolderBrowserDialog path = new FolderBrowserDialog();
+                if (lastpath != path.SelectedPath)
+                    path.SelectedPath = lastpath;
                 path.ShowDialog();
                 this.txtAddress.Text = path.SelectedPath;
+                lastpath = this.txtAddress.Text;
             }
             catch (Exception ex)
             {
@@ -164,7 +168,7 @@ namespace ScanFile
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message+ex.StackTrace);
+                MessageBox.Show(ex.Message + ex.StackTrace);
             }
         }
 
@@ -181,6 +185,7 @@ namespace ScanFile
                 string defaultname = this.txtCustomer.Text.Trim() + this.txtYear.Text.Trim() + ".xls";
                 string savePaht = ExcelHelper.GetSaveFilePath(defaultname);
                 string sheet = this.txtCustomer.Text.Trim() == "" ? this.txtYear.Text.Trim() : this.txtCustomer.Text.Trim();
+                if (string.IsNullOrEmpty(savePaht)) return;
                 ExcelHelper.ExportToExcel(dt, sheet, savePaht);
                 OpenFileDir(savePaht);
             }
