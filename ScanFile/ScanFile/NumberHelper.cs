@@ -53,6 +53,7 @@ namespace ScanFile
                 if (source.Contains("十") && source.Length > 1)
                 {
                     string[] numbers = source.Split('十');
+                    numbers[0] = numbers[0] == "" ? "1" : numbers[0];
                     return numbers[0].ToNumber() * 10 + numbers[1].ToNumber();
                 }
                 return ConvertToNumber(source);
