@@ -92,6 +92,7 @@ namespace ScanFile
         {
             string folder = this.txtAddress.Text.Trim();
             ScanBind(folder);
+            SetRecountCount();
             return;
             Action<string> ac = new Action<string>(ScanBind);
             ac.BeginInvoke(folder, null, null);
@@ -137,16 +138,20 @@ namespace ScanFile
                 dr["文件名"] = fileName;
                 dr["完全路径"] = fullName;
                 dr["时间"] = currentDate.ToString("yyyy-MM-dd");
-                var qty = fileName.MatchQTY();
-                dr["数量"] = qty.ToString();
+
 
                 var ld = fileName.MatchLength();
                 if (ld[0] == 0) ld = currentFolder.MatchLength();
                 if (ld[0] == 0) ld = currentFolder2.MatchLength();
                 dr["长度"] = (ld[0] / 100).ToString();
                 dr["宽度"] = (ld[1] / 100).ToString();
-                var size = ((ld[0] / 100) * (ld[1] / 100));
-                dr["面积"] = size.ToString();
+                var size = (1000 * ld[0] * ld[1]) / 10000000;
+                dr["面积"] = size;
+
+                var qty = 1;
+                if (this.cbx3split.Checked && ld[2] > 0) qty = Convert.ToInt32(ld[2]);
+                else qty = fileName.MatchQTY();
+                dr["数量"] = qty;
 
                 string printType = GetPrintType(fileName);
                 if (printType == "")
@@ -159,7 +164,7 @@ namespace ScanFile
                 var price = GetUnitPrice(printType);
                 dr["单价"] = price;
 
-                dr["总价"] = GetTotalAmount(qty, price, size, printType);
+                dr["总价"] = Math.Round(GetTotalAmount(qty, price, size, printType), 2);
                 fileList.Rows.Add(dr);
             }
             if (this.cbxChild.Checked)
@@ -168,7 +173,14 @@ namespace ScanFile
                 foreach (DirectoryInfo folderItem in directory.GetDirectories())
                 {
                     if (floderReg.IsMatch(folderItem.Name))
-                        currentDate = Convert.ToDateTime(this.txtYear.Text.Trim() + "-" + folderItem.Name.Replace(".", "-"));
+                        try
+                        {
+                            currentDate = Convert.ToDateTime(this.txtYear.Text.Trim() + "-" + folderItem.Name.Replace(".", "-"));
+                        }
+                        catch
+                        {
+                            currentDate = DateTime.MinValue;
+                        }
                     ScanFile(folder + "\\" + folderItem.Name);
                 }
             }
@@ -242,10 +254,7 @@ namespace ScanFile
 
         private string GetPrintType(string fileName)
         {
-            if (fileName.Contains("写真") || fileName.Contains("车贴"))
-            {
-                return "写真";
-            }
+
             if (fileName.Contains("灯片"))
             {
                 return "灯片";
@@ -266,21 +275,25 @@ namespace ScanFile
             {
                 return "单透";
             }
+            if (fileName.Contains("写真") || fileName.Contains("车贴"))
+            {
+                return "写真";
+            }
             return "";
         }
 
         private DataTable CreateTable()
         {
             DataTable result = new DataTable();
-            result.Columns.Add("时间");
+            result.Columns.Add("时间", typeof(DateTime));
             result.Columns.Add("文件名");
-            result.Columns.Add("长度");
-            result.Columns.Add("宽度");
-            result.Columns.Add("面积");
+            result.Columns.Add("长度", typeof(double));
+            result.Columns.Add("宽度", typeof(double));
+            result.Columns.Add("面积", typeof(double));
             result.Columns.Add("类型");
-            result.Columns.Add("数量");
-            result.Columns.Add("单价");
-            result.Columns.Add("总价");
+            result.Columns.Add("数量", typeof(int));
+            result.Columns.Add("单价", typeof(double));
+            result.Columns.Add("总价", typeof(double));
             result.Columns.Add("完全路径");
             return result;
         }
@@ -308,6 +321,12 @@ namespace ScanFile
             open.Start();
         }
 
+        private void SetRecountCount()
+        {
+            this.lblRecordCount.Text = (dataGridView1.DataSource as DataTable).Rows.Count.ToString();
+            this.lblAmountCount.Text = (dataGridView1.DataSource as DataTable).AsEnumerable().Sum(x => (double)x["总价"]).ToString();
+        }
+
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
@@ -318,6 +337,7 @@ namespace ScanFile
                 dataGridView1.Rows[index].Cells["总价"].Value = (dataGridView1.Rows[index].Cells["类型"].Value.ToString() == "奖牌" ? 1 : Convert.ToDouble(dataGridView1.Rows[index].Cells["面积"].Value))
                     * Convert.ToDouble(dataGridView1.Rows[index].Cells["单价"].Value)
                     * Convert.ToDouble(dataGridView1.Rows[index].Cells["数量"].Value);
+                SetRecountCount();
             }
             catch
             {

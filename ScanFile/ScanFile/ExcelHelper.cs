@@ -360,7 +360,7 @@ public static class ExcelHelper
                         temp.SetCellValue("打开文件夹");
                     }
                     temp.Hyperlink = link;
-                   
+
                 }
             }
 
@@ -368,12 +368,13 @@ public static class ExcelHelper
             if (rowIndex > 1)
             {
                 string rowDate = sourceTable.Rows[rowIndex - 1]["时间"].ToString();
-                if (rowDate == currentDate)
+                if (rowIndex != sourceTable.Rows.Count && rowDate == currentDate)
                 {
                     margenCount++;
                 }
                 else
                 {
+                    if (rowIndex == sourceTable.Rows.Count) margenCount++;
                     currentDate = rowDate;
                     sheet.AddMergedRegion(new CellRangeAddress(margenIndex, margenIndex + margenCount, 0, 0));
                     //合并之前单元格

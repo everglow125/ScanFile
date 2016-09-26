@@ -21,7 +21,7 @@ namespace ScanFile
                 GroupCollection gc = match.Groups;
                 result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
                 result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
-                if (result[0] < 4)
+                if (result[0] < 3)
                 {
                     result[0] = result[0] * 100;
                     result[1] = result[1] * 100;
@@ -79,6 +79,7 @@ namespace ScanFile
                 {
                     result[0] = flag1;
                     result[1] = flag2;
+                    result[2] = flag3;
                 }
                 if (result[0] < 3)
                 {
@@ -91,7 +92,7 @@ namespace ScanFile
 
         public static double[] MatchLength(this string fileName)
         {
-            double[] result = { 0, 0 };
+            double[] result = { 0, 0, 0 };
             if (!MatchUnitLength(fileName, ref result))
             {
                 if (!Match3Split(fileName, ref  result))

@@ -58,6 +58,11 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.cbx3split = new System.Windows.Forms.CheckBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.lblRecordCount = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.lblAmountCount = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -69,6 +74,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.cbx3split);
             this.groupBox1.Controls.Add(this.txtCustomer);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.txtYear);
@@ -88,7 +94,7 @@
             // 
             // txtCustomer
             // 
-            this.txtCustomer.Location = new System.Drawing.Point(982, 30);
+            this.txtCustomer.Location = new System.Drawing.Point(1158, 30);
             this.txtCustomer.Name = "txtCustomer";
             this.txtCustomer.Size = new System.Drawing.Size(108, 21);
             this.txtCustomer.TabIndex = 20;
@@ -96,7 +102,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(950, 33);
+            this.label3.Location = new System.Drawing.Point(1126, 33);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(29, 12);
             this.label3.TabIndex = 19;
@@ -104,7 +110,7 @@
             // 
             // txtYear
             // 
-            this.txtYear.Location = new System.Drawing.Point(752, 32);
+            this.txtYear.Location = new System.Drawing.Point(981, 30);
             this.txtYear.Name = "txtYear";
             this.txtYear.Size = new System.Drawing.Size(108, 21);
             this.txtYear.TabIndex = 18;
@@ -112,7 +118,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(719, 35);
+            this.label2.Location = new System.Drawing.Point(948, 33);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 12);
             this.label2.TabIndex = 17;
@@ -150,7 +156,7 @@
             // 
             // btnOpen
             // 
-            this.btnOpen.Location = new System.Drawing.Point(528, 20);
+            this.btnOpen.Location = new System.Drawing.Point(752, 19);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(141, 40);
             this.btnOpen.TabIndex = 13;
@@ -293,6 +299,10 @@
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.lblAmountCount);
+            this.groupBox3.Controls.Add(this.label12);
+            this.groupBox3.Controls.Add(this.lblRecordCount);
+            this.groupBox3.Controls.Add(this.label10);
             this.groupBox3.Controls.Add(this.btnExportFile);
             this.groupBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.groupBox3.Location = new System.Drawing.Point(0, 572);
@@ -304,9 +314,9 @@
             // 
             // btnExportFile
             // 
-            this.btnExportFile.Location = new System.Drawing.Point(577, 19);
+            this.btnExportFile.Location = new System.Drawing.Point(971, 20);
             this.btnExportFile.Name = "btnExportFile";
-            this.btnExportFile.Size = new System.Drawing.Size(141, 40);
+            this.btnExportFile.Size = new System.Drawing.Size(184, 47);
             this.btnExportFile.TabIndex = 30;
             this.btnExportFile.Text = "导出文件";
             this.btnExportFile.UseVisualStyleBackColor = true;
@@ -356,6 +366,52 @@
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
+            // cbx3split
+            // 
+            this.cbx3split.AutoSize = true;
+            this.cbx3split.Location = new System.Drawing.Point(518, 32);
+            this.cbx3split.Name = "cbx3split";
+            this.cbx3split.Size = new System.Drawing.Size(180, 16);
+            this.cbx3split.TabIndex = 21;
+            this.cbx3split.Text = "1-2-3 解析为 长1-宽2-份数3";
+            this.cbx3split.UseVisualStyleBackColor = true;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(35, 37);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(53, 12);
+            this.label10.TabIndex = 31;
+            this.label10.Text = "文件个数";
+            // 
+            // lblRecordCount
+            // 
+            this.lblRecordCount.AutoSize = true;
+            this.lblRecordCount.Location = new System.Drawing.Point(108, 37);
+            this.lblRecordCount.Name = "lblRecordCount";
+            this.lblRecordCount.Size = new System.Drawing.Size(23, 12);
+            this.lblRecordCount.TabIndex = 32;
+            this.lblRecordCount.Text = "N/A";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(419, 37);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(53, 12);
+            this.label12.TabIndex = 33;
+            this.label12.Text = "金额总计";
+            // 
+            // lblAmountCount
+            // 
+            this.lblAmountCount.AutoSize = true;
+            this.lblAmountCount.Location = new System.Drawing.Point(483, 37);
+            this.lblAmountCount.Name = "lblAmountCount";
+            this.lblAmountCount.Size = new System.Drawing.Size(23, 12);
+            this.lblAmountCount.TabIndex = 34;
+            this.lblAmountCount.Text = "N/A";
+            // 
             // ScanFolder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -374,6 +430,7 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox5.ResumeLayout(false);
@@ -413,6 +470,11 @@
         private System.Windows.Forms.TextBox txtDengpian;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.CheckBox cbx3split;
+        private System.Windows.Forms.Label lblAmountCount;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label lblRecordCount;
+        private System.Windows.Forms.Label label10;
     }
 }
 
