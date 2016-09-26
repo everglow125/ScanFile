@@ -13,6 +13,7 @@ namespace ScanFile
         public static Dictionary<string, int> numbers = new Dictionary<string, int>(){
             {"一",1},
             {"二",2},
+            {"两",2},
             {"三",3},
             {"四",4},
             {"五",5},

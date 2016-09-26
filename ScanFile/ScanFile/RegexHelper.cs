@@ -26,13 +26,70 @@ namespace ScanFile
                     result[0] = result[0] * 100;
                     result[1] = result[1] * 100;
                 }
+                if (result[0] > 200 && result[1] > 200)
+                {
+                    result[0] = result[0] / 10;
+                    result[1] = result[1] / 10;
+                }
             }
             return true;
         }
 
-        private static bool MatchUnitLength(string source, ref double[] result)
+        private static bool MatchBeforeUnitLength(string source, ref double[] result)
         {
-            Regex reg = new Regex(ConfigurationManager.AppSettings["hasUnitReg"]);
+            Regex reg = new Regex(ConfigurationManager.AppSettings["hasUnitBeforeReg"]);
+            var matchs = reg.Matches(source);
+            if (matchs == null || matchs.Count == 0)
+                return false;
+            foreach (Match match in matchs)
+            {
+                GroupCollection gc = match.Groups;
+                result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
+                result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+                string unit = gc["Unit"].Value;
+                if (unit != "CM")
+                {
+                    result[0] = result[0] * 100;
+                    result[1] = result[1] * 100;
+                }
+                if (unit == "MM")
+                {
+                    result[0] = result[0] / 1000;
+                    result[1] = result[1] / 1000;
+                }
+            }
+            return true;
+        }
+
+        private static bool MatchAfterUnitLength(string source, ref double[] result)
+        {
+            Regex reg = new Regex(ConfigurationManager.AppSettings["hasUnitAfterReg"]);
+            var matchs = reg.Matches(source);
+            if (matchs == null || matchs.Count == 0)
+                return false;
+            foreach (Match match in matchs)
+            {
+                GroupCollection gc = match.Groups;
+                result[0] = Convert.ToDouble(gc["length"].Value.Replace("点", "."));
+                result[1] = Convert.ToDouble(gc["width"].Value.Replace("点", "."));
+                string unit = gc["Unit"].Value;
+                if (unit != "CM")
+                {
+                    result[0] = result[0] * 100;
+                    result[1] = result[1] * 100;
+                }
+                if (unit == "MM")
+                {
+                    result[0] = result[0] / 1000;
+                    result[1] = result[1] / 1000;
+                }
+            }
+            return true;
+        }
+
+        private static bool MatchBothUnitLength(string source, ref double[] result)
+        {
+            Regex reg = new Regex(ConfigurationManager.AppSettings["bothUnitReg"]);
             var matchs = reg.Matches(source);
             if (matchs == null || matchs.Count == 0)
                 return false;
@@ -93,13 +150,19 @@ namespace ScanFile
         public static double[] MatchLength(this string fileName)
         {
             double[] result = { 0, 0, 0 };
-            if (!MatchUnitLength(fileName, ref result))
+            if (!MatchBothUnitLength(fileName, ref result))
             {
-                if (!Match3Split(fileName, ref  result))
+                if (!MatchBeforeUnitLength(fileName, ref result))
                 {
-                    if (!MatchNoUnitLength(fileName, ref  result))
+                    if (!MatchAfterUnitLength(fileName, ref result))
                     {
-                        return result;
+                        if (!Match3Split(fileName, ref  result))
+                        {
+                            if (!MatchNoUnitLength(fileName, ref  result))
+                            {
+                                return result;
+                            }
+                        }
                     }
                 }
             }
@@ -118,6 +181,23 @@ namespace ScanFile
                 qty = gc["QTY"].Value.ToNumber();
             }
             return qty;
+        }
+
+
+        public static String ToDBC(this string input)
+        {
+            char[] c = input.ToCharArray();
+            for (int i = 0; i < c.Length; i++)
+            {
+                if (c[i] == 12288)
+                {
+                    c[i] = (char)32;
+                    continue;
+                }
+                if (c[i] > 65280 && c[i] < 65375)
+                    c[i] = (char)(c[i] - 65248);
+            }
+            return new String(c);
         }
     }
 }

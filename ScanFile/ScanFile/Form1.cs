@@ -138,33 +138,10 @@ namespace ScanFile
                 dr["文件名"] = fileName;
                 dr["完全路径"] = fullName;
                 dr["时间"] = currentDate.ToString("yyyy-MM-dd");
-
-
-                var ld = fileName.MatchLength();
-                if (ld[0] == 0) ld = currentFolder.MatchLength();
-                if (ld[0] == 0) ld = currentFolder2.MatchLength();
-                dr["长度"] = (ld[0] / 100).ToString();
-                dr["宽度"] = (ld[1] / 100).ToString();
-                var size = (1000 * ld[0] * ld[1]) / 10000000;
-                dr["面积"] = size;
-
-                var qty = 1;
-                if (this.cbx3split.Checked && ld[2] > 0) qty = Convert.ToInt32(ld[2]);
-                else qty = fileName.MatchQTY();
-                dr["数量"] = qty;
-
-                string printType = GetPrintType(fileName);
-                if (printType == "")
-                    printType = GetPrintType(currentFolder);
-                if (printType == "")
-                    printType = GetPrintType(currentFolder2);
-                if (printType == "")
-                    printType = "写真";
-                dr["类型"] = printType;
-                var price = GetUnitPrice(printType);
-                dr["单价"] = price;
-
-                dr["总价"] = Math.Round(GetTotalAmount(qty, price, size, printType), 2);
+                if (!SetCellValue(ref dr, fileName, currentFolder, currentFolder2))
+                {
+                    SetCellValue(ref  dr, fileName.ToDBC(), currentFolder, currentFolder2);
+                }
                 fileList.Rows.Add(dr);
             }
             if (this.cbxChild.Checked)
@@ -184,6 +161,38 @@ namespace ScanFile
                     ScanFile(folder + "\\" + folderItem.Name);
                 }
             }
+        }
+
+        private bool SetCellValue(ref DataRow dr, string fileName, string currentFolder, string currentFolder2)
+        {
+            var ld = fileName.MatchLength();
+            if (ld[0] == 0) ld = currentFolder.MatchLength();
+            if (ld[0] == 0) ld = currentFolder2.MatchLength();
+            dr["长度"] = (ld[0] / 100).ToString();
+            dr["宽度"] = (ld[1] / 100).ToString();
+            var size = (1000 * ld[0] * ld[1]) / 10000000;
+            dr["面积"] = size;
+
+            var qty = 1;
+            if (this.cbx3split.Checked && ld[2] > 0) qty = Convert.ToInt32(ld[2]);
+            else qty = fileName.MatchQTY();
+            dr["数量"] = qty;
+
+            string printType = GetPrintType(fileName);
+            if (printType == "")
+                printType = GetPrintType(currentFolder);
+            if (printType == "")
+                printType = GetPrintType(currentFolder2);
+            if (printType == "")
+                printType = "写真";
+            dr["类型"] = printType;
+            var price = GetUnitPrice(printType);
+            dr["单价"] = price;
+            var amount = Math.Round(GetTotalAmount(qty, price, size, printType), 2);
+            dr["总价"] = amount;
+            if (amount == 0)
+                return false;
+            return true;
         }
 
         private double GetTotalAmount(int qty, double price, double size, string type)
@@ -263,7 +272,7 @@ namespace ScanFile
             {
                 return "UV";
             }
-            if (fileName.Contains("KT板"))
+            if (fileName.Contains("KT"))
             {
                 return "KT板";
             }
