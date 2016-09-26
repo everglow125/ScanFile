@@ -269,6 +269,20 @@ public static class ExcelHelper
 
         ISheet sheet = workbook.CreateSheet(sheetName);
         IRow headerRow = sheet.CreateRow(0);
+        IFont fontHead = workbook.CreateFont();
+        fontHead.Boldweight = (int)FontBoldWeight.Bold;
+        fontHead.FontHeight = 256;
+
+        ICellStyle styleHead = workbook.CreateCellStyle();
+        styleHead.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleHead.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleHead.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleHead.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        styleHead.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+        styleHead.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        styleHead.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
+        styleHead.SetFont(fontHead);
+
         ICellStyle style = workbook.CreateCellStyle();
         style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
         style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
@@ -276,6 +290,7 @@ public static class ExcelHelper
         style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
         style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
         style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
+
         ICellStyle styleleft = workbook.CreateCellStyle();
         styleleft.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
         styleleft.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
@@ -289,7 +304,7 @@ public static class ExcelHelper
             // if (column.ColumnName == "完全路径") continue;
             ICell headerCell = headerRow.CreateCell(column.Ordinal);
             headerCell.SetCellValue(column.ColumnName);
-            headerCell.CellStyle = cellStyle;
+            headerCell.CellStyle = styleHead;
 
         }
 

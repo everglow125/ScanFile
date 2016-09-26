@@ -98,6 +98,12 @@ namespace ScanFile
 
         public void ScanBind(string folder)
         {
+            if (this.txtCustomer.Text.Trim() == "")
+            {
+                string[] folders = folder.Replace("/", "\\").Split('\\');
+                Regex regYear = new Regex(@"\d+年");
+                this.txtCustomer.Text = regYear.Replace(folders[folders.Length - 1], "");
+            }
             ScanFile(folder);
             BindFileList();
         }
@@ -118,22 +124,41 @@ namespace ScanFile
             {
                 if (!file.Name.Trim().ToUpper().EndsWith("JPG"))
                     continue;
+
+                string fileName = file.Name.Trim().ToUpper();
+                string[] folderList = folder.Split('\\');
+                string currentFolder = folderList[folderList.Length - 1].Trim().ToUpper();
+                string currentFolder2 = folderList.Length > 1 ? folderList[folderList.Length - 2].Trim().ToUpper() : "";
+
                 string fullName = folder + "\\" + file.Name;
                 DataRow dr = fileList.NewRow();
-                dr["文件名"] = file.Name.Trim().ToUpper();
+
+                dr["文件名"] = fileName;
                 dr["完全路径"] = fullName;
                 dr["时间"] = currentDate.ToString("yyyy-MM-dd");
-                dr["类型"] = GetPrintType(dr["文件名"].ToString());
-                var price = GetUnitPrice(dr["类型"].ToString());
-                dr["单价"] = price;
-                var ld = dr["文件名"].ToString().MatchLength();
+                var qty = fileName.MatchQTY();
+                dr["数量"] = qty.ToString();
+
+                var ld = fileName.MatchLength();
+                if (ld[0] == 0) ld = currentFolder.MatchLength();
+                if (ld[0] == 0) ld = currentFolder2.MatchLength();
                 dr["长度"] = (ld[0] / 100).ToString();
                 dr["宽度"] = (ld[1] / 100).ToString();
                 var size = ((ld[0] / 100) * (ld[1] / 100));
                 dr["面积"] = size.ToString();
-                var qty = dr["文件名"].ToString().MatchQTY();
-                dr["数量"] = qty.ToString();
-                dr["总价"] = GetTotalAmount(qty, price, size, dr["类型"].ToString());
+
+                string printType = GetPrintType(fileName);
+                if (printType == "")
+                    printType = GetPrintType(currentFolder);
+                if (printType == "")
+                    printType = GetPrintType(currentFolder2);
+                if (printType == "")
+                    printType = "写真";
+                dr["类型"] = printType;
+                var price = GetUnitPrice(printType);
+                dr["单价"] = price;
+
+                dr["总价"] = GetTotalAmount(qty, price, size, printType);
                 fileList.Rows.Add(dr);
             }
             if (this.cbxChild.Checked)
@@ -216,6 +241,10 @@ namespace ScanFile
 
         private string GetPrintType(string fileName)
         {
+            if (fileName.Contains("写真") || fileName.Contains("车贴"))
+            {
+                return "写真";
+            }
             if (fileName.Contains("灯片"))
             {
                 return "灯片";
@@ -236,7 +265,7 @@ namespace ScanFile
             {
                 return "单透";
             }
-            return "写真";
+            return "";
         }
 
         private DataTable CreateTable()
