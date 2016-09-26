@@ -26,7 +26,7 @@ namespace ScanFile
                     result[0] = result[0] * 100;
                     result[1] = result[1] * 100;
                 }
-                if (result[0] > 200 && result[1] > 200)
+                if (result[0] > 400 && result[1] > 400)
                 {
                     result[0] = result[0] / 10;
                     result[1] = result[1] / 10;
@@ -152,10 +152,11 @@ namespace ScanFile
             double[] result = { 0, 0, 0 };
             if (!MatchBothUnitLength(fileName, ref result))
             {
-                if (!MatchBeforeUnitLength(fileName, ref result))
+                if (!MatchAfterUnitLength(fileName, ref result))
                 {
-                    if (!MatchAfterUnitLength(fileName, ref result))
+                    if (!MatchBeforeUnitLength(fileName, ref result))
                     {
+
                         if (!Match3Split(fileName, ref  result))
                         {
                             if (!MatchNoUnitLength(fileName, ref  result))
