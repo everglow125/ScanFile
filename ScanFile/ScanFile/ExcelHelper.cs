@@ -349,9 +349,18 @@ public static class ExcelHelper
                     //创建一个超链接对象
                     IHyperlink link = new HSSFHyperlink(HyperlinkType.Url);
                     // strTableName 这个参数为 sheet名字 A1 为单元格 其他是固定格式
-                    link.Address = row[column].ToString();
+                    if (ConfigurationManager.AppSettings["IsOpenFile"].Trim().ToLower() == "true")
+                    {
+                        link.Address = row[column].ToString();
+                        temp.SetCellValue("打开文件");
+                    }
+                    else
+                    {
+                        link.Address = row[column].ToString().Substring(0, row[column].ToString().LastIndexOf("\\"));
+                        temp.SetCellValue("打开文件夹");
+                    }
                     temp.Hyperlink = link;
-                    temp.SetCellValue("打开文件");
+                   
                 }
             }
 

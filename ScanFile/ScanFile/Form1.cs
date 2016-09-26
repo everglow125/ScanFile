@@ -40,9 +40,10 @@ namespace ScanFile
         private void CheckAuthentication()
         {
             var MAC_Address = MachineUtil.GetNetCardMAC().ToUpper().Trim();
-            string Mac_AddressGroup = ConfigurationManager.AppSettings["MacAddressGroup"].ToUpper().Trim();
+            string Mac_AddressGroup = ConfigurationManager.AppSettings["MacAddressGroup"].Dencrypt();
             if (!Mac_AddressGroup.Contains(MAC_Address))
             {
+
                 bool showMacAddress = ConfigurationManager.AppSettings["showMacAddress"].ToUpper().Trim() == "TRUE";
                 if (showMacAddress)
                 {
