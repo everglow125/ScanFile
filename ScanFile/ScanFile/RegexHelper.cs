@@ -57,6 +57,14 @@ namespace ScanFile
                     result[0] = result[0] / 1000;
                     result[1] = result[1] / 1000;
                 }
+                if (unit == "米" || unit == "M")
+                {
+                    if (result[0] > 20)
+                    {
+                        result[0] = result[0] / 100;
+                        result[1] = result[1] / 100;
+                    }
+                }
             }
             return true;
         }
@@ -83,6 +91,14 @@ namespace ScanFile
                     result[0] = result[0] / 1000;
                     result[1] = result[1] / 1000;
                 }
+                if (unit == "米" || unit == "M")
+                {
+                    if (result[0] > 20)
+                    {
+                        result[0] = result[0] / 100;
+                        result[1] = result[1] / 100;
+                    }
+                }
             }
             return true;
         }
@@ -108,6 +124,14 @@ namespace ScanFile
                 {
                     result[0] = result[0] / 1000;
                     result[1] = result[1] / 1000;
+                }
+                if (unit == "米" || unit == "M")
+                {
+                    if (result[0] > 20)
+                    {
+                        result[0] = result[0] / 100;
+                        result[1] = result[1] / 100;
+                    }
                 }
             }
             return true;
