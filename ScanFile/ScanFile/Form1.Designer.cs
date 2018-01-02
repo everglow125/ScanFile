@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScanFolder));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.cbx3split = new System.Windows.Forms.CheckBox();
             this.txtCustomer = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtYear = new System.Windows.Forms.TextBox();
@@ -40,6 +41,16 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cbxCustomer = new System.Windows.Forms.ComboBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.txtTouming = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.txtChetie = new System.Windows.Forms.TextBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.txtHeijiao = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
+            this.txt_Penhui = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.txtDengpian = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.txtJiangpai = new System.Windows.Forms.TextBox();
@@ -53,21 +64,16 @@
             this.txtXiezhen = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.lblAmountCount = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.lblRecordCount = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.btnExportFile = new System.Windows.Forms.Button();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.cbx3split = new System.Windows.Forms.CheckBox();
-            this.label10 = new System.Windows.Forms.Label();
-            this.lblRecordCount = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.lblAmountCount = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -91,6 +97,16 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "源文件导入";
+            // 
+            // cbx3split
+            // 
+            this.cbx3split.AutoSize = true;
+            this.cbx3split.Location = new System.Drawing.Point(518, 32);
+            this.cbx3split.Name = "cbx3split";
+            this.cbx3split.Size = new System.Drawing.Size(180, 16);
+            this.cbx3split.TabIndex = 21;
+            this.cbx3split.Text = "1-2-3 解析为 长1-宽2-份数3";
+            this.cbx3split.UseVisualStyleBackColor = true;
             // 
             // txtCustomer
             // 
@@ -175,6 +191,16 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.cbxCustomer);
+            this.groupBox2.Controls.Add(this.label11);
+            this.groupBox2.Controls.Add(this.txtTouming);
+            this.groupBox2.Controls.Add(this.label14);
+            this.groupBox2.Controls.Add(this.txtChetie);
+            this.groupBox2.Controls.Add(this.label15);
+            this.groupBox2.Controls.Add(this.txtHeijiao);
+            this.groupBox2.Controls.Add(this.label16);
+            this.groupBox2.Controls.Add(this.txt_Penhui);
+            this.groupBox2.Controls.Add(this.label17);
             this.groupBox2.Controls.Add(this.txtDengpian);
             this.groupBox2.Controls.Add(this.label9);
             this.groupBox2.Controls.Add(this.txtJiangpai);
@@ -190,14 +216,100 @@
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Top;
             this.groupBox2.Location = new System.Drawing.Point(0, 73);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1295, 62);
+            this.groupBox2.Size = new System.Drawing.Size(1295, 145);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "价格设置";
             // 
+            // cbxCustomer
+            // 
+            this.cbxCustomer.FormattingEnabled = true;
+            this.cbxCustomer.Location = new System.Drawing.Point(81, 20);
+            this.cbxCustomer.Name = "cbxCustomer";
+            this.cbxCustomer.Size = new System.Drawing.Size(216, 20);
+            this.cbxCustomer.TabIndex = 41;
+            this.cbxCustomer.SelectedIndexChanged += new System.EventHandler(this.cbxCustomer_SelectedIndexChanged);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(29, 21);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(29, 12);
+            this.label11.TabIndex = 40;
+            this.label11.Text = "客户";
+            // 
+            // txtTouming
+            // 
+            this.txtTouming.Location = new System.Drawing.Point(998, 53);
+            this.txtTouming.Name = "txtTouming";
+            this.txtTouming.Size = new System.Drawing.Size(108, 21);
+            this.txtTouming.TabIndex = 39;
+            this.txtTouming.Text = "18";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(921, 56);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(95, 12);
+            this.label14.TabIndex = 38;
+            this.label14.Text = "透明车贴(元/平)";
+            // 
+            // txtChetie
+            // 
+            this.txtChetie.Location = new System.Drawing.Point(800, 53);
+            this.txtChetie.Name = "txtChetie";
+            this.txtChetie.Size = new System.Drawing.Size(108, 21);
+            this.txtChetie.TabIndex = 37;
+            this.txtChetie.Text = "12";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(723, 56);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(71, 12);
+            this.label15.TabIndex = 36;
+            this.label15.Text = "车贴(元/平)";
+            // 
+            // txtHeijiao
+            // 
+            this.txtHeijiao.Location = new System.Drawing.Point(601, 53);
+            this.txtHeijiao.Name = "txtHeijiao";
+            this.txtHeijiao.Size = new System.Drawing.Size(108, 21);
+            this.txtHeijiao.TabIndex = 35;
+            this.txtHeijiao.Text = "65";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(536, 56);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(71, 12);
+            this.label16.TabIndex = 34;
+            this.label16.Text = "黑胶(元/平)";
+            // 
+            // txt_Penhui
+            // 
+            this.txt_Penhui.Location = new System.Drawing.Point(414, 53);
+            this.txt_Penhui.Name = "txt_Penhui";
+            this.txt_Penhui.Size = new System.Drawing.Size(108, 21);
+            this.txt_Penhui.TabIndex = 33;
+            this.txt_Penhui.Text = "10";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(337, 56);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(71, 12);
+            this.label17.TabIndex = 32;
+            this.label17.Text = "喷绘(元/平)";
+            // 
             // txtDengpian
             // 
-            this.txtDengpian.Location = new System.Drawing.Point(1014, 24);
+            this.txtDengpian.Location = new System.Drawing.Point(1158, 53);
             this.txtDengpian.Name = "txtDengpian";
             this.txtDengpian.Size = new System.Drawing.Size(108, 21);
             this.txtDengpian.TabIndex = 31;
@@ -206,7 +318,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(979, 27);
+            this.label9.Location = new System.Drawing.Point(1123, 56);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(29, 12);
             this.label9.TabIndex = 30;
@@ -214,7 +326,7 @@
             // 
             // txtJiangpai
             // 
-            this.txtJiangpai.Location = new System.Drawing.Point(843, 24);
+            this.txtJiangpai.Location = new System.Drawing.Point(1158, 20);
             this.txtJiangpai.Name = "txtJiangpai";
             this.txtJiangpai.Size = new System.Drawing.Size(108, 21);
             this.txtJiangpai.TabIndex = 28;
@@ -223,7 +335,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(808, 27);
+            this.label8.Location = new System.Drawing.Point(1123, 23);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(29, 12);
             this.label8.TabIndex = 27;
@@ -231,7 +343,7 @@
             // 
             // txtDantou
             // 
-            this.txtDantou.Location = new System.Drawing.Point(683, 24);
+            this.txtDantou.Location = new System.Drawing.Point(998, 20);
             this.txtDantou.Name = "txtDantou";
             this.txtDantou.Size = new System.Drawing.Size(108, 21);
             this.txtDantou.TabIndex = 26;
@@ -240,7 +352,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(606, 27);
+            this.label7.Location = new System.Drawing.Point(921, 23);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(71, 12);
             this.label7.TabIndex = 25;
@@ -248,7 +360,7 @@
             // 
             // txtKT
             // 
-            this.txtKT.Location = new System.Drawing.Point(485, 24);
+            this.txtKT.Location = new System.Drawing.Point(800, 20);
             this.txtKT.Name = "txtKT";
             this.txtKT.Size = new System.Drawing.Size(108, 21);
             this.txtKT.TabIndex = 24;
@@ -257,7 +369,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(408, 27);
+            this.label6.Location = new System.Drawing.Point(723, 23);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(71, 12);
             this.label6.TabIndex = 23;
@@ -265,7 +377,7 @@
             // 
             // txtUV
             // 
-            this.txtUV.Location = new System.Drawing.Point(286, 24);
+            this.txtUV.Location = new System.Drawing.Point(601, 20);
             this.txtUV.Name = "txtUV";
             this.txtUV.Size = new System.Drawing.Size(108, 21);
             this.txtUV.TabIndex = 22;
@@ -274,7 +386,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(221, 27);
+            this.label5.Location = new System.Drawing.Point(536, 23);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(59, 12);
             this.label5.TabIndex = 21;
@@ -282,7 +394,7 @@
             // 
             // txtXiezhen
             // 
-            this.txtXiezhen.Location = new System.Drawing.Point(99, 24);
+            this.txtXiezhen.Location = new System.Drawing.Point(414, 20);
             this.txtXiezhen.Name = "txtXiezhen";
             this.txtXiezhen.Size = new System.Drawing.Size(108, 21);
             this.txtXiezhen.TabIndex = 20;
@@ -291,7 +403,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(22, 27);
+            this.label4.Location = new System.Drawing.Point(337, 23);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(71, 12);
             this.label4.TabIndex = 19;
@@ -312,6 +424,42 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "数据导出";
             // 
+            // lblAmountCount
+            // 
+            this.lblAmountCount.AutoSize = true;
+            this.lblAmountCount.Location = new System.Drawing.Point(483, 37);
+            this.lblAmountCount.Name = "lblAmountCount";
+            this.lblAmountCount.Size = new System.Drawing.Size(23, 12);
+            this.lblAmountCount.TabIndex = 34;
+            this.lblAmountCount.Text = "N/A";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(419, 37);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(53, 12);
+            this.label12.TabIndex = 33;
+            this.label12.Text = "金额总计";
+            // 
+            // lblRecordCount
+            // 
+            this.lblRecordCount.AutoSize = true;
+            this.lblRecordCount.Location = new System.Drawing.Point(108, 37);
+            this.lblRecordCount.Name = "lblRecordCount";
+            this.lblRecordCount.Size = new System.Drawing.Size(23, 12);
+            this.lblRecordCount.TabIndex = 32;
+            this.lblRecordCount.Text = "N/A";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(35, 37);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(53, 12);
+            this.label10.TabIndex = 31;
+            this.label10.Text = "文件个数";
+            // 
             // btnExportFile
             // 
             this.btnExportFile.Location = new System.Drawing.Point(971, 20);
@@ -322,34 +470,13 @@
             this.btnExportFile.UseVisualStyleBackColor = true;
             this.btnExportFile.Click += new System.EventHandler(this.btnExportFile_Click);
             // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.pictureBox1);
-            this.groupBox4.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBox4.Location = new System.Drawing.Point(968, 135);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(327, 437);
-            this.groupBox4.TabIndex = 3;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "图片预览";
-            this.groupBox4.Visible = false;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 17);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(321, 417);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
             // groupBox5
             // 
             this.groupBox5.Controls.Add(this.dataGridView1);
             this.groupBox5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox5.Location = new System.Drawing.Point(0, 135);
+            this.groupBox5.Location = new System.Drawing.Point(0, 218);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(968, 437);
+            this.groupBox5.Size = new System.Drawing.Size(1295, 354);
             this.groupBox5.TabIndex = 4;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "数据";
@@ -361,56 +488,10 @@
             this.dataGridView1.Location = new System.Drawing.Point(3, 17);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 23;
-            this.dataGridView1.Size = new System.Drawing.Size(962, 417);
+            this.dataGridView1.Size = new System.Drawing.Size(1289, 334);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
-            // 
-            // cbx3split
-            // 
-            this.cbx3split.AutoSize = true;
-            this.cbx3split.Location = new System.Drawing.Point(518, 32);
-            this.cbx3split.Name = "cbx3split";
-            this.cbx3split.Size = new System.Drawing.Size(180, 16);
-            this.cbx3split.TabIndex = 21;
-            this.cbx3split.Text = "1-2-3 解析为 长1-宽2-份数3";
-            this.cbx3split.UseVisualStyleBackColor = true;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(35, 37);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(53, 12);
-            this.label10.TabIndex = 31;
-            this.label10.Text = "文件个数";
-            // 
-            // lblRecordCount
-            // 
-            this.lblRecordCount.AutoSize = true;
-            this.lblRecordCount.Location = new System.Drawing.Point(108, 37);
-            this.lblRecordCount.Name = "lblRecordCount";
-            this.lblRecordCount.Size = new System.Drawing.Size(23, 12);
-            this.lblRecordCount.TabIndex = 32;
-            this.lblRecordCount.Text = "N/A";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(419, 37);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(53, 12);
-            this.label12.TabIndex = 33;
-            this.label12.Text = "金额总计";
-            // 
-            // lblAmountCount
-            // 
-            this.lblAmountCount.AutoSize = true;
-            this.lblAmountCount.Location = new System.Drawing.Point(483, 37);
-            this.lblAmountCount.Name = "lblAmountCount";
-            this.lblAmountCount.Size = new System.Drawing.Size(23, 12);
-            this.lblAmountCount.TabIndex = 34;
-            this.lblAmountCount.Text = "N/A";
             // 
             // ScanFolder
             // 
@@ -418,7 +499,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1295, 651);
             this.Controls.Add(this.groupBox5);
-            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -431,8 +511,6 @@
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox5.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
@@ -444,7 +522,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox txtCustomer;
         private System.Windows.Forms.Label label3;
@@ -469,12 +546,21 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox txtDengpian;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.CheckBox cbx3split;
         private System.Windows.Forms.Label lblAmountCount;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label lblRecordCount;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ComboBox cbxCustomer;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox txtTouming;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox txtChetie;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox txtHeijiao;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.TextBox txt_Penhui;
+        private System.Windows.Forms.Label label17;
     }
 }
 

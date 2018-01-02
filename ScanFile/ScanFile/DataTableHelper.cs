@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using System;
 using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-
 
 public class DataTableHelper
 {
-
     public static MemoryStream DateTableToMemoryStream(DataTable dt)
     {
         if (dt == null)
@@ -20,39 +14,41 @@ public class DataTableHelper
         }
         try
         {
+            int num;
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet();
             IRow row = sheet.CreateRow(0);
-            DataColumn col = null;
-            //NPOI.SS.UserModel.CellType cellType;
-            for (int i = 0; i < dt.Columns.Count; i++)
+            DataColumn column = null;
+            for (num = 0; num < dt.Columns.Count; num++)
             {
-                col = dt.Columns[i];
-                row.CreateCell(i, CellType.String).SetCellValue(col.ColumnName);
+                column = dt.Columns[num];
+                row.CreateCell(num, CellType.String).SetCellValue(column.ColumnName);
             }
-            for (int i = 0; i < dt.Rows.Count; i++)
+            for (num = 0; num < dt.Rows.Count; num++)
             {
-                row = sheet.CreateRow(i + 1);//创建内容行     
-                for (int j = 0; j < dt.Columns.Count; j++)
+                row = sheet.CreateRow(num + 1);
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    double temp;
-                    if (double.TryParse(dt.Rows[i][j].ToString(), out temp))
-                        row.CreateCell(j, CellType.Numeric).SetCellValue(temp);
+                    double num3;
+                    if (double.TryParse(dt.Rows[num][i].ToString(), out num3))
+                    {
+                        row.CreateCell(i, CellType.Numeric).SetCellValue(num3);
+                    }
                     else
-                        row.CreateCell(j, CellType.String).SetCellValue(dt.Rows[i][j].ToString());
+                    {
+                        row.CreateCell(i, CellType.String).SetCellValue(dt.Rows[num][i].ToString());
+                    }
                 }
             }
-            MemoryStream ms = new MemoryStream();
-            workbook.Write(ms);
-            return ms;
-
+            MemoryStream stream = new MemoryStream();
+            workbook.Write(stream);
+            return stream;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }
     }
-
 
     public static Stream DateTableToStream(DataTable dt)
     {
@@ -62,34 +58,37 @@ public class DataTableHelper
         }
         try
         {
+            int num;
             HSSFWorkbook workbook = new HSSFWorkbook();
             ISheet sheet = workbook.CreateSheet();
             IRow row = sheet.CreateRow(0);
-            DataColumn col = null;
-            //NPOI.SS.UserModel.CellType cellType;
-            for (int i = 0; i < dt.Columns.Count; i++)
+            DataColumn column = null;
+            for (num = 0; num < dt.Columns.Count; num++)
             {
-                col = dt.Columns[i];
-                row.CreateCell(i, CellType.String).SetCellValue(col.ColumnName);
+                column = dt.Columns[num];
+                row.CreateCell(num, CellType.String).SetCellValue(column.ColumnName);
             }
-            for (int i = 0; i < dt.Rows.Count; i++)
+            for (num = 0; num < dt.Rows.Count; num++)
             {
-                row = sheet.CreateRow(i + 1); //创建内容行     
-                for (int j = 0; j < dt.Columns.Count; j++)
+                row = sheet.CreateRow(num + 1);
+                for (int i = 0; i < dt.Columns.Count; i++)
                 {
-                    double temp;
-                    if (double.TryParse(dt.Rows[i][j].ToString(), out temp))
-                        row.CreateCell(j, CellType.Numeric).SetCellValue(temp);
+                    double num3;
+                    if (double.TryParse(dt.Rows[num][i].ToString(), out num3))
+                    {
+                        row.CreateCell(i, CellType.Numeric).SetCellValue(num3);
+                    }
                     else
-                        row.CreateCell(j, CellType.String).SetCellValue(dt.Rows[i][j].ToString());
+                    {
+                        row.CreateCell(i, CellType.String).SetCellValue(dt.Rows[num][i].ToString());
+                    }
                 }
             }
-            Stream ms = new MemoryStream();
-            workbook.Write(ms);
-            return ms;
-
+            Stream stream = new MemoryStream();
+            workbook.Write(stream);
+            return stream;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return null;
         }

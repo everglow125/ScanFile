@@ -1,93 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ScanFile
+﻿namespace ScanFile
 {
+    using System;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Security.Cryptography;
+
     public static class DESEncrypt
     {
-        public static string Encrypt(this string source)
+        private static string Dencrypt(EncryptInfo model)
         {
-            EncryptInfo model = new EncryptInfo(source);
-            model.Iv = "liaojing";
-            model.Key = "liaojing";
-            return Encrypt(model);
-        }
-        public static string Dencrypt(this string source)
-        {
-            EncryptInfo model = new EncryptInfo(source);
-            model.Iv = "liaojing";
-            model.Key = "liaojing";
-            return Dencrypt(model);
-        }
-        private static string Encrypt(EncryptInfo model)
-        {
-            string result = "";
             try
             {
-                byte[] byKey = model.Encode.GetBytes(model.Key);
-                byte[] byIV = model.Encode.GetBytes(model.Iv);
-                DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
-                int i = cryptoProvider.KeySize;
-                using (MemoryStream ms = new MemoryStream())
-                using (CryptoStream cst = new CryptoStream(ms, cryptoProvider.CreateEncryptor(byKey, byIV), CryptoStreamMode.Write))
-                using (StreamWriter sw = new StreamWriter(cst))
+                string str = "";
+                byte[] bytes = model.Encode.GetBytes(model.Key);
+                byte[] rgbIV = model.Encode.GetBytes(model.Iv);
+                byte[] buffer = Convert.FromBase64String(model.Source);
+                DESCryptoServiceProvider provider = new DESCryptoServiceProvider();
+                using (MemoryStream stream = new MemoryStream(buffer))
                 {
-                    sw.Write(model.Source);
-                    sw.Flush();
-                    cst.FlushFinalBlock();
-                    sw.Flush();
-                    result = Convert.ToBase64String(ms.GetBuffer(), 0, (int)ms.Length);
+                    using (CryptoStream stream2 = new CryptoStream(stream, provider.CreateDecryptor(bytes, rgbIV), CryptoStreamMode.Read))
+                    {
+                        using (StreamReader reader = new StreamReader(stream2))
+                        {
+                            str = reader.ReadToEnd();
+                        }
+                    }
+                }
+                return str;
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        public static string Dencrypt(this string source)
+        {
+            EncryptInfo model = new EncryptInfo(source)
+            {
+                Iv = "liaojing",
+                Key = "liaojing"
+            };
+            return Dencrypt(model);
+        }
+
+        private static string Encrypt(EncryptInfo model)
+        {
+            string str = "";
+            try
+            {
+                byte[] bytes = model.Encode.GetBytes(model.Key);
+                byte[] rgbIV = model.Encode.GetBytes(model.Iv);
+                DESCryptoServiceProvider provider = new DESCryptoServiceProvider();
+                int keySize = provider.KeySize;
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    using (CryptoStream stream2 = new CryptoStream(stream, provider.CreateEncryptor(bytes, rgbIV), CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter writer = new StreamWriter(stream2))
+                        {
+                            writer.Write(model.Source);
+                            writer.Flush();
+                            stream2.FlushFinalBlock();
+                            writer.Flush();
+                            str = Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length);
+                        }
+                    }
+                    return str;
                 }
             }
             catch
             {
                 return "";
             }
-            return result;
+            return str;
         }
 
-        private static string Dencrypt(EncryptInfo model)
+        public static string Encrypt(this string source)
         {
-            try
+            EncryptInfo model = new EncryptInfo(source)
             {
-                string result = "";
-                byte[] byKey = model.Encode.GetBytes(model.Key);
-                byte[] byIV = model.Encode.GetBytes(model.Iv);
-                byte[] byEnc = Convert.FromBase64String(model.Source);
-                DESCryptoServiceProvider cryptoProvider = new DESCryptoServiceProvider();
-                using (MemoryStream ms = new MemoryStream(byEnc))
-                using (CryptoStream cst = new CryptoStream(ms, cryptoProvider.CreateDecryptor(byKey, byIV), CryptoStreamMode.Read))
-                using (StreamReader sr = new StreamReader(cst))
-                    result = sr.ReadToEnd();
-                return result;
-            }
-            catch
-            {
-                return "";
-            }
+                Iv = "liaojing",
+                Key = "liaojing"
+            };
+            return Encrypt(model);
         }
-    }
-    public class EncryptInfo
-    {
-        public EncryptInfo(string source)
-        {
-            this.Source = source;
-            this.Encode = Encoding.Default;
-        }
-
-        public EncryptInfo(string source, Encoding encode)
-        {
-            this.Source = source;
-            this.Encode = encode;
-        }
-        public string Source { get; set; }
-        public string Key { get; set; }
-        public string Iv { get; set; }
-        public Encoding Encode { get; set; }
     }
 }
+

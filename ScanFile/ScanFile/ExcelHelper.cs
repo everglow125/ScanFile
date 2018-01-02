@@ -1,101 +1,131 @@
-﻿using System;
+﻿using Microsoft.CSharp.RuntimeBinder;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.SS.Util;
+using NPOI.XSSF.UserModel;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-
-using NPOI.HSSF.UserModel;
-using NPOI.HSSF.Util;
-using NPOI.SS.UserModel;
-
-
-using System.Web;
-using NPOI.XSSF.UserModel;
 using System.Windows.Forms;
-using NPOI.SS.Util;
 
 public static class ExcelHelper
 {
-
-    #region 私有方法
-
-    /// <summary>
-    /// 获取要保存的文件名称（含完整路径）
-    /// </summary>
-    /// <returns></returns>
-    public static string GetSaveFilePath(string fileName = "")
+    public static string ConvertColumnIndexToColumnName(int index)
     {
-        SaveFileDialog saveFileDig = new SaveFileDialog();
-        saveFileDig.Filter = "Excel Office97-2003(*.xls)|*.xls|Excel Office2007及以上(*.xlsx)|*.xlsx";
-        saveFileDig.FileName = fileName;
-        saveFileDig.FilterIndex = 0;
-        saveFileDig.Title = "导出到";
-        saveFileDig.OverwritePrompt = true;
-        saveFileDig.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        string filePath = null;
-        if (saveFileDig.ShowDialog() == DialogResult.OK)
+        index++;
+        int num = 0x1a;
+        char[] chArray = new char[100];
+        int capacity = 0;
+        while (index > 0)
         {
-            filePath = saveFileDig.FileName;
+            int num3 = index % num;
+            if (num3 == 0)
+            {
+                num3 = num;
+            }
+            chArray[capacity++] = (char)((num3 - 1) + 0x41);
+            index = (index - 1) / 0x1a;
         }
-
-        return filePath;
-    }
-
-    /// <summary>
-    /// 获取要打开要导入的文件名称（含完整路径）
-    /// </summary>
-    /// <returns></returns>
-    private static string GetOpenFilePath()
-    {
-        OpenFileDialog openFileDig = new OpenFileDialog();
-        openFileDig.Filter = "Excel Office97-2003(*.xls)|*.xls|Excel Office2007及以上(*.xlsx)|*.xlsx";
-        openFileDig.FilterIndex = 0;
-        openFileDig.Title = "打开";
-        openFileDig.CheckFileExists = true;
-        openFileDig.CheckPathExists = true;
-        openFileDig.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        string filePath = null;
-        if (openFileDig.ShowDialog() == DialogResult.OK)
+        StringBuilder builder = new StringBuilder(capacity);
+        for (int i = capacity - 1; i >= 0; i--)
         {
-            filePath = openFileDig.FileName;
+            builder.Append(chArray[i]);
         }
-
-        return filePath;
+        return builder.ToString();
     }
 
-    /// <summary>
-    /// 判断是否为兼容模式
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <returns></returns>
-    private static bool GetIsCompatible(string filePath)
+    public static bool ConvertToBoolen(object b)
     {
-        return filePath.EndsWith(".xls", StringComparison.OrdinalIgnoreCase);
+        string str = (b ?? "").ToString().Trim();
+        bool result = false;
+        if (bool.TryParse(str, out result))
+        {
+            return result;
+        }
+        if ((str != "0") && (str != "1"))
+        {
+            throw new Exception("布尔格式不正确，转换布尔类型失败！");
+        }
+        return (str == "0");
     }
 
+    public static DateTime ConvertToDate(object date)
+    {
+        string s = (date ?? "").ToString();
+        DateTime result = new DateTime();
+        if (!DateTime.TryParse(s, out result))
+        {
+            try
+            {
+                string str2 = "";
+                if (s.Contains("-"))
+                {
+                    str2 = "-";
+                }
+                else if (s.Contains("/"))
+                {
+                    str2 = "/";
+                }
+                string[] strArray = s.Split(str2.ToCharArray());
+                int num = Convert.ToInt32(strArray[2]);
+                int num2 = Convert.ToInt32(strArray[0]);
+                int num3 = Convert.ToInt32(strArray[1]);
+                string str3 = Convert.ToString(num);
+                string str4 = Convert.ToString(num2);
+                string str5 = Convert.ToString(num3);
+                if (str4.Length == 4)
+                {
+                    result = Convert.ToDateTime(date);
+                }
+                else
+                {
+                    if (str3.Length == 1)
+                    {
+                        str3 = "0" + str3;
+                    }
+                    if (str4.Length == 1)
+                    {
+                        str4 = "0" + str4;
+                    }
+                    if (str5.Length == 1)
+                    {
+                        str5 = "0" + str5;
+                    }
+                    result = Convert.ToDateTime("20" + str3 + "-" + str4 + "-" + str5);
+                }
+            }
+            catch
+            {
+                throw new Exception("日期格式不正确，转换日期类型失败！");
+            }
+        }
+        return result;
+    }
 
+    public static decimal ConvertToDecimal(object d)
+    {
+        string s = (d ?? "").ToString();
+        decimal result = 0M;
+        if (!decimal.TryParse(s, out result))
+        {
+            throw new Exception("数字格式不正确，转换数字类型失败！");
+        }
+        return result;
+    }
 
-    /// <summary>
-    /// 创建工作薄
-    /// </summary>
-    /// <param name="isCompatible"></param>
-    /// <returns></returns>
     private static IWorkbook CreateWorkbook(bool isCompatible)
     {
         if (isCompatible)
         {
             return new HSSFWorkbook();
         }
-        else
-        {
-            return new XSSFWorkbook();
-        }
+        return new XSSFWorkbook();
     }
 
     /// <summary>
@@ -115,655 +145,452 @@ public static class ExcelHelper
             return new XSSFWorkbook(stream);
         }
     }
+    public static string ExportToExcel(DataSet sourceDs, string filePath = null)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            filePath = GetSaveFilePath("");
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return null;
+        }
+        IWorkbook workbook = CreateWorkbook(GetIsCompatible(filePath));
+        ICellStyle cellStyle = GetCellStyle(workbook);
+        for (int i = 0; i < sourceDs.Tables.Count; i++)
+        {
+            DataTable table = sourceDs.Tables[i];
+            string sheetname = "result" + i.ToString();
+            ISheet sheet = workbook.CreateSheet(sheetname);
+            IRow row = sheet.CreateRow(0);
+            foreach (DataColumn column in table.Columns)
+            {
+                ICell cell = row.CreateCell(column.Ordinal);
+                cell.SetCellValue(column.ColumnName);
+                cell.CellStyle = cellStyle;
+            }
+            int rownum = 1;
+            foreach (DataRow row2 in table.Rows)
+            {
+                IRow row3 = sheet.CreateRow(rownum);
+                foreach (DataColumn column in table.Columns)
+                {
+                    row3.CreateCell(column.Ordinal).SetCellValue((row2[column] ?? "").ToString());
+                }
+                rownum++;
+            }
+        }
+        FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        workbook.Write(stream);
+        stream.Dispose();
+        workbook = null;
+        return filePath;
+    }
 
-    /// <summary>
-    /// 创建表格头单元格
-    /// </summary>
-    /// <param name="sheet"></param>
-    /// <returns></returns>
+    public static string ExportToExcel(DataTable sourceTable, string sheetName = "result", string filePath = null)
+    {
+        if (sourceTable.Rows.Count <= 0)
+        {
+            return null;
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            filePath = GetSaveFilePath("");
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return null;
+        }
+        IWorkbook workbook = CreateWorkbook(GetIsCompatible(filePath));
+        ICellStyle cellStyle = GetCellStyle(workbook);
+        ISheet sheet = workbook.CreateSheet(sheetName);
+        IRow row = sheet.CreateRow(0);
+        NPOI.SS.UserModel.IFont font = workbook.CreateFont();
+        font.Boldweight = 700;
+        font.FontHeight = 256.0;
+        ICellStyle style2 = workbook.CreateCellStyle();
+        style2.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style2.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style2.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style2.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style2.FillForegroundColor = 0x16;
+        style2.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        style2.VerticalAlignment = VerticalAlignment.Top;
+        style2.SetFont(font);
+        ICellStyle style3 = workbook.CreateCellStyle();
+        style3.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style3.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style3.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style3.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style3.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        style3.VerticalAlignment = VerticalAlignment.Top;
+        IDataFormat format = workbook.CreateDataFormat();
+        ICellStyle style4 = workbook.CreateCellStyle();
+        style4.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style4.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style4.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style4.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style4.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
+        style4.VerticalAlignment = VerticalAlignment.Top;
+        style4.DataFormat = format.GetFormat("mm月dd日");
+        ICellStyle style5 = workbook.CreateCellStyle();
+        style5.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
+        style5.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
+        style5.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
+        style5.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
+        style5.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Left;
+        style5.VerticalAlignment = VerticalAlignment.Top;
+        foreach (DataColumn column in sourceTable.Columns)
+        {
+            ICell cell = row.CreateCell(column.Ordinal);
+            cell.SetCellValue(column.ColumnName);
+            cell.CellStyle = style2;
+        }
+        int rownum = 1;
+        int firstRow = 1;
+        int num3 = 0;
+        string str = sourceTable.Rows[0][0].ToString();
+        foreach (DataRow row2 in sourceTable.Rows)
+        {
+            IRow row3 = sheet.CreateRow(rownum);
+            foreach (DataColumn column in sourceTable.Columns)
+            {
+                ICell cell2 = row3.CreateCell(column.Ordinal);
+                if (((((column.ColumnName == "长度") || (column.ColumnName == "宽度")) || ((column.ColumnName == "面积") || (column.ColumnName == "单价"))) || (column.ColumnName == "总价")) || (column.ColumnName == "数量"))
+                {
+                    cell2.SetCellValue(Convert.ToDouble(row2[column]));
+                    cell2.SetCellType(CellType.Numeric);
+                    if (column.ColumnName == "面积")
+                    {
+                        cell2.SetCellFormula(string.Format("C{0}*D{0}", rownum + 1));
+                    }
+                    if (column.ColumnName == "总价")
+                    {
+                        if (row2["类型"].ToString() != "奖牌")
+                        {
+                            cell2.SetCellFormula(string.Format("E{0}*H{0}*G{0}", rownum + 1));
+                        }
+                        else
+                        {
+                            cell2.SetCellFormula(string.Format("H{0}*G{0}", rownum + 1));
+                        }
+                    }
+                }
+                else if (column.ColumnName == "时间")
+                {
+                    DateTime date = Convert.ToDateTime(row2["时间"].ToString()).Date;
+                    cell2.SetCellValue(date);
+                }
+                else
+                {
+                    cell2.SetCellValue((row2[column] ?? "").ToString());
+                }
+                cell2.CellStyle = (column.ColumnName == "文件名") ? style5 : ((column.ColumnName == "时间") ? style4 : style3);
+                if (column.ColumnName == "完全路径")
+                {
+                    IHyperlink hyperlink = new HSSFHyperlink(HyperlinkType.Url);
+                    if (ConfigurationManager.AppSettings["IsOpenFile"].Trim().ToLower() == "true")
+                    {
+                        hyperlink.Address = row2[column].ToString();
+                        cell2.SetCellValue("打开文件");
+                    }
+                    else
+                    {
+                        hyperlink.Address = row2[column].ToString().Substring(0, row2[column].ToString().LastIndexOf(@"\"));
+                        cell2.SetCellValue("打开文件夹");
+                    }
+                    cell2.Hyperlink = hyperlink;
+                }
+            }
+            if (rownum > 1)
+            {
+                string str2 = sourceTable.Rows[rownum - 1]["时间"].ToString();
+                if ((rownum != sourceTable.Rows.Count) && (str2 == str))
+                {
+                    num3++;
+                }
+                else
+                {
+                    if (rownum == sourceTable.Rows.Count)
+                    {
+                        num3++;
+                    }
+                    str = str2;
+                    sheet.AddMergedRegion(new CellRangeAddress(firstRow, firstRow + num3, 0, 0));
+                    firstRow = rownum;
+                    num3 = 0;
+                }
+            }
+            rownum++;
+        }
+        for (int i = 0; i < (sourceTable.Rows.Count - 1); i++)
+        {
+            if (i == 1)
+            {
+                sheet.SetColumnWidth(i, 0x1900);
+            }
+            else
+            {
+                sheet.SetColumnWidth(i, 0xc00);
+            }
+        }
+        sheet.CreateRow(rownum).CreateCell(8).SetCellFormula(string.Format("SUM(I2:I{0})", rownum));
+        sheet.CreateFreezePane(0, 1, 0, 1);
+        FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        workbook.Write(stream);
+        stream.Dispose();
+        sheet = null;
+        row = null;
+        workbook = null;
+        return filePath;
+    }
+
+    public static string ExportToExcel(DataGridView grid, string sheetName = "result", string filePath = null)
+    {
+        if (grid.Rows.Count <= 0)
+        {
+            return null;
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            filePath = GetSaveFilePath("");
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return null;
+        }
+        IWorkbook workbook = CreateWorkbook(GetIsCompatible(filePath));
+        ICellStyle cellStyle = GetCellStyle(workbook);
+        ISheet sheet = workbook.CreateSheet(sheetName);
+        IRow row = sheet.CreateRow(0);
+        for (int i = 0; i < grid.Columns.Count; i++)
+        {
+            ICell cell = row.CreateCell(i);
+            cell.SetCellValue(grid.Columns[i].HeaderText);
+            cell.CellStyle = cellStyle;
+        }
+        int rownum = 1;
+        foreach (DataGridViewRow row2 in (IEnumerable)grid.Rows)
+        {
+            IRow row3 = sheet.CreateRow(rownum);
+            for (int j = 0; j < grid.Columns.Count; j++)
+            {
+                row3.CreateCell(j).SetCellValue((row2.Cells[j].Value ?? "").ToString());
+            }
+            rownum++;
+        }
+        FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        workbook.Write(stream);
+        stream.Dispose();
+        sheet = null;
+        row = null;
+        workbook = null;
+        return filePath;
+    }
+
+    public static string ExportToExcel<T>(List<T> data, IList<KeyValuePair<string, string>> headerNameList, string sheetName = "result", string filePath = null) where T : class
+    {
+        KeyValuePair<string, string> pair;
+        if (data.Count <= 0)
+        {
+            return null;
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            filePath = GetSaveFilePath("");
+        }
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return null;
+        }
+        IWorkbook workbook = CreateWorkbook(GetIsCompatible(filePath));
+        ICellStyle cellStyle = GetCellStyle(workbook);
+        ISheet sheet = workbook.CreateSheet(sheetName);
+        IRow row = sheet.CreateRow(0);
+        for (int i = 0; i < headerNameList.Count; i++)
+        {
+            ICell cell = row.CreateCell(i);
+            pair = headerNameList[i];
+            cell.SetCellValue(pair.Value);
+            cell.CellStyle = cellStyle;
+        }
+        System.Type type = typeof(T);
+        int rownum = 1;
+        foreach (T local in data)
+        {
+            IRow row2 = sheet.CreateRow(rownum);
+            for (int j = 0; j < headerNameList.Count; j++)
+            {
+                pair = headerNameList[j];
+                object obj2 = type.GetProperty(pair.Key).GetValue(local, null);
+                row2.CreateCell(j).SetCellValue((obj2 ?? "").ToString());
+            }
+            rownum++;
+        }
+        FileStream stream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        workbook.Write(stream);
+        stream.Dispose();
+        sheet = null;
+        row = null;
+        workbook = null;
+        return filePath;
+    }
+
     private static ICellStyle GetCellStyle(IWorkbook workbook)
     {
         ICellStyle style = workbook.CreateCellStyle();
         style.FillPattern = FillPattern.SolidForeground;
-        style.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
+        style.FillForegroundColor = 0x16;
         style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
         style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
         style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
         style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
         style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
-        style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
-
+        style.VerticalAlignment = VerticalAlignment.Top;
         return style;
     }
 
-
-    /// <summary>
-    /// 从工作表中生成DataTable
-    /// </summary>
-    /// <param name="sheet"></param>
-    /// <param name="headerRowIndex"></param>
-    /// <returns></returns>
     private static DataTable GetDataTableFromSheet(ISheet sheet, int headerRowIndex)
     {
+        int num2;
         DataTable table = new DataTable();
-
-        IRow headerRow = sheet.GetRow(headerRowIndex);
-        int cellCount = headerRow.LastCellNum;
-
-        for (int i = headerRow.FirstCellNum; i < cellCount; i++)
+        IRow row = sheet.GetRow(headerRowIndex);
+        int lastCellNum = row.LastCellNum;
+        for (num2 = row.FirstCellNum; num2 < lastCellNum; num2++)
         {
-            if (headerRow.GetCell(i) == null || headerRow.GetCell(i).StringCellValue.Trim() == "")
+            if ((row.GetCell(num2) == null) || (row.GetCell(num2).StringCellValue.Trim() == ""))
             {
-                // 如果遇到第一个空列，则不再继续向后读取
-                cellCount = i;
+                lastCellNum = num2;
                 break;
             }
-            DataColumn column = new DataColumn(headerRow.GetCell(i).StringCellValue);
+            DataColumn column = new DataColumn(row.GetCell(num2).StringCellValue);
             table.Columns.Add(column);
         }
-
-        for (int i = (headerRowIndex + 1); i <= sheet.LastRowNum; i++)
+        for (num2 = headerRowIndex + 1; num2 <= sheet.LastRowNum; num2++)
         {
-            IRow row = sheet.GetRow(i);
-            //如果遇到某行的第一个单元格的值为空，则不再继续向下读取
-            if (row != null && !string.IsNullOrEmpty(row.GetCell(0).ToString()))
+            IRow row2 = sheet.GetRow(num2);
+            if ((row2 != null) && !string.IsNullOrEmpty(row2.GetCell(0).ToString()))
             {
-                DataRow dataRow = table.NewRow();
-
-                for (int j = row.FirstCellNum; j < cellCount; j++)
+                DataRow row3 = table.NewRow();
+                for (int i = row2.FirstCellNum; i < lastCellNum; i++)
                 {
-                    dataRow[j] = row.GetCell(j).ToString();
+                    row3[i] = row2.GetCell(i).ToString();
                 }
-
-                table.Rows.Add(dataRow);
+                table.Rows.Add(row3);
             }
         }
-
         return table;
     }
 
-    #endregion
-
-    #region 公共导出方法
-
-    /// <summary>
-    /// 由DataSet导出Excel
-    /// </summary>
-    /// <param name="sourceTable">要导出数据的DataTable</param>
-    /// <returns>Excel工作表</returns>
-    public static string ExportToExcel(DataSet sourceDs, string filePath = null)
+    private static bool GetIsCompatible(string filePath)
     {
-
-        if (string.IsNullOrEmpty(filePath))
-        {
-            filePath = GetSaveFilePath();
-        }
-
-        if (string.IsNullOrEmpty(filePath)) return null;
-
-        bool isCompatible = GetIsCompatible(filePath);
-
-        IWorkbook workbook = CreateWorkbook(isCompatible);
-        ICellStyle cellStyle = GetCellStyle(workbook);
-
-        for (int i = 0; i < sourceDs.Tables.Count; i++)
-        {
-            DataTable table = sourceDs.Tables[i];
-            string sheetName = "result" + i.ToString();
-            ISheet sheet = workbook.CreateSheet(sheetName);
-            IRow headerRow = sheet.CreateRow(0);
-            // handling header.
-            foreach (DataColumn column in table.Columns)
-            {
-                ICell cell = headerRow.CreateCell(column.Ordinal);
-                cell.SetCellValue(column.ColumnName);
-                cell.CellStyle = cellStyle;
-            }
-
-            // handling value.
-            int rowIndex = 1;
-
-            foreach (DataRow row in table.Rows)
-            {
-                IRow dataRow = sheet.CreateRow(rowIndex);
-
-                foreach (DataColumn column in table.Columns)
-                {
-                    dataRow.CreateCell(column.Ordinal).SetCellValue((row[column] ?? "").ToString());
-                }
-
-                rowIndex++;
-            }
-        }
-
-        FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        workbook.Write(fs);
-        fs.Dispose();
-        workbook = null;
-
-        return filePath;
-
+        return filePath.EndsWith(".xls", StringComparison.OrdinalIgnoreCase);
     }
 
-
-    /// <summary>
-    /// 由DataTable导出Excel
-    /// </summary>
-    /// <param name="sourceTable">要导出数据的DataTable</param>
-    /// <returns>Excel工作表</returns>
-    public static string ExportToExcel(DataTable sourceTable, string sheetName = "result", string filePath = null)
+    private static string GetOpenFilePath()
     {
-        if (sourceTable.Rows.Count <= 0) return null;
-
-        if (string.IsNullOrEmpty(filePath))
+        OpenFileDialog dialog = new OpenFileDialog
         {
-            filePath = GetSaveFilePath();
-        }
-
-        if (string.IsNullOrEmpty(filePath)) return null;
-
-        bool isCompatible = GetIsCompatible(filePath);
-
-        IWorkbook workbook = CreateWorkbook(isCompatible);
-        ICellStyle cellStyle = GetCellStyle(workbook);
-
-        ISheet sheet = workbook.CreateSheet(sheetName);
-        IRow headerRow = sheet.CreateRow(0);
-        IFont fontHead = workbook.CreateFont();
-        fontHead.Boldweight = (int)FontBoldWeight.Bold;
-        fontHead.FontHeight = 256;
-
-        ICellStyle styleHead = workbook.CreateCellStyle();
-        styleHead.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleHead.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleHead.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleHead.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleHead.FillForegroundColor = NPOI.HSSF.Util.HSSFColor.Grey25Percent.Index;
-        styleHead.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
-        styleHead.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
-        styleHead.SetFont(fontHead);
-
-        ICellStyle style = workbook.CreateCellStyle();
-        style.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
-        style.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
-        style.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
-        style.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
-        style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Center;
-        style.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
-
-        ICellStyle styleleft = workbook.CreateCellStyle();
-        styleleft.BorderBottom = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleleft.BorderLeft = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleleft.BorderRight = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleleft.BorderTop = NPOI.SS.UserModel.BorderStyle.Thin;
-        styleleft.Alignment = NPOI.SS.UserModel.HorizontalAlignment.Left;
-        styleleft.VerticalAlignment = NPOI.SS.UserModel.VerticalAlignment.Top;
-        // handling header.
-        foreach (DataColumn column in sourceTable.Columns)
+            Filter = "Excel Office97-2003(*.xls)|*.xls|Excel Office2007及以上(*.xlsx)|*.xlsx",
+            FilterIndex = 0,
+            Title = "打开",
+            CheckFileExists = true,
+            CheckPathExists = true,
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+        };
+        string fileName = null;
+        if (dialog.ShowDialog() == DialogResult.OK)
         {
-            // if (column.ColumnName == "完全路径") continue;
-            ICell headerCell = headerRow.CreateCell(column.Ordinal);
-            headerCell.SetCellValue(column.ColumnName);
-            headerCell.CellStyle = styleHead;
-
+            fileName = dialog.FileName;
         }
-
-        // handling value.
-        int rowIndex = 1;
-        int margenIndex = 1;
-        int margenCount = 0;
-        string currentDate = sourceTable.Rows[0][0].ToString();
-
-        foreach (DataRow row in sourceTable.Rows)
-        {
-            IRow dataRow = sheet.CreateRow(rowIndex);
-
-            foreach (DataColumn column in sourceTable.Columns)
-            {
-
-                var temp = dataRow.CreateCell(column.Ordinal);
-                if (column.ColumnName == "长度" || column.ColumnName == "宽度" || column.ColumnName == "面积" || column.ColumnName == "单价" || column.ColumnName == "总价" || column.ColumnName == "数量")
-                {
-                    temp.SetCellValue(Convert.ToDouble(row[column]));
-                    temp.SetCellType(CellType.Numeric);
-                    if (column.ColumnName == "面积")
-                    {
-                        temp.SetCellFormula(string.Format("C{0}*D{0}", rowIndex + 1));
-                    }
-                    if (column.ColumnName == "总价")
-                    {
-                        if (row["类型"].ToString() != "奖牌")
-                            temp.SetCellFormula(string.Format("E{0}*H{0}*G{0}", rowIndex + 1));
-                        else
-                            temp.SetCellFormula(string.Format("H{0}*G{0}", rowIndex + 1));
-                    }
-
-                }
-                else
-                {
-                    temp.SetCellValue((row[column] ?? "").ToString());
-                }
-                temp.CellStyle = column.ColumnName != "文件名" ? style : styleleft;
-                if (column.ColumnName == "完全路径")
-                {
-                    //创建一个超链接对象
-                    IHyperlink link = new HSSFHyperlink(HyperlinkType.Url);
-                    // strTableName 这个参数为 sheet名字 A1 为单元格 其他是固定格式
-                    if (ConfigurationManager.AppSettings["IsOpenFile"].Trim().ToLower() == "true")
-                    {
-                        link.Address = row[column].ToString();
-                        temp.SetCellValue("打开文件");
-                    }
-                    else
-                    {
-                        link.Address = row[column].ToString().Substring(0, row[column].ToString().LastIndexOf("\\"));
-                        temp.SetCellValue("打开文件夹");
-                    }
-                    temp.Hyperlink = link;
-
-                }
-            }
-
-
-            if (rowIndex > 1)
-            {
-                string rowDate = sourceTable.Rows[rowIndex - 1]["时间"].ToString();
-                if (rowIndex != sourceTable.Rows.Count && rowDate == currentDate)
-                {
-                    margenCount++;
-                }
-                else
-                {
-                    if (rowIndex == sourceTable.Rows.Count) margenCount++;
-                    currentDate = rowDate;
-                    sheet.AddMergedRegion(new CellRangeAddress(margenIndex, margenIndex + margenCount, 0, 0));
-                    //合并之前单元格
-                    margenIndex = rowIndex;
-                    margenCount = 0;
-                }
-            }
-            rowIndex++;
-        }
-        for (int i = 0; i < sourceTable.Rows.Count - 1; i++)
-        {
-            if (i == 1) sheet.SetColumnWidth(i, 25 * 256); else sheet.SetColumnWidth(i, 256 * 12);
-            //sheet.AutoSizeColumn(i, true);
-        }
-        IRow countRow = sheet.CreateRow(rowIndex);
-        var tt = countRow.CreateCell(8);
-        tt.SetCellFormula(string.Format("SUM(I2:I{0})", rowIndex));
-        sheet.CreateFreezePane(0, 1, 0, 1);
-        FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        workbook.Write(fs);
-        fs.Dispose();
-
-        sheet = null;
-        headerRow = null;
-        workbook = null;
-
-        return filePath;
+        return fileName;
     }
 
-    /// <summary>
-    /// 由List导出Excel
-    /// </summary>
-    /// <typeparam name="T">类型</typeparam>
-    /// <param name="data">在导出的List</param>
-    /// <param name="sheetName">sheet名称</param>
-    /// <returns></returns>
-    public static string ExportToExcel<T>(List<T> data, IList<KeyValuePair<string, string>> headerNameList, string sheetName = "result", string filePath = null) where T : class
+    public static string GetSaveFilePath(string fileName = "")
     {
-        if (data.Count <= 0) return null;
-
-        if (string.IsNullOrEmpty(filePath))
+        SaveFileDialog dialog = new SaveFileDialog
         {
-            filePath = GetSaveFilePath();
-        }
-
-        if (string.IsNullOrEmpty(filePath)) return null;
-
-        bool isCompatible = GetIsCompatible(filePath);
-
-        IWorkbook workbook = CreateWorkbook(isCompatible);
-        ICellStyle cellStyle = GetCellStyle(workbook);
-        ISheet sheet = workbook.CreateSheet(sheetName);
-        IRow headerRow = sheet.CreateRow(0);
-
-        for (int i = 0; i < headerNameList.Count; i++)
+            Filter = "Excel Office97-2003(*.xls)|*.xls|Excel Office2007及以上(*.xlsx)|*.xlsx",
+            FileName = fileName,
+            FilterIndex = 0,
+            Title = "导出到",
+            OverwritePrompt = true,
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+        };
+        string str = null;
+        if (dialog.ShowDialog() == DialogResult.OK)
         {
-            ICell cell = headerRow.CreateCell(i);
-            cell.SetCellValue(headerNameList[i].Value);
-            cell.CellStyle = cellStyle;
+            str = dialog.FileName;
         }
-
-        Type t = typeof(T);
-        int rowIndex = 1;
-        foreach (T item in data)
-        {
-            IRow dataRow = sheet.CreateRow(rowIndex);
-            for (int n = 0; n < headerNameList.Count; n++)
-            {
-                object pValue = t.GetProperty(headerNameList[n].Key).GetValue(item, null);
-                dataRow.CreateCell(n).SetCellValue((pValue ?? "").ToString());
-            }
-            rowIndex++;
-        }
-        FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        workbook.Write(fs);
-        fs.Dispose();
-
-        sheet = null;
-        headerRow = null;
-        workbook = null;
-
-        return filePath;
+        return str;
     }
 
-    /// <summary>
-    /// 由DataGridView导出
-    /// </summary>
-    /// <param name="grid"></param>
-    /// <param name="sheetName"></param>
-    /// <param name="filePath"></param>
-    /// <returns></returns>
-    public static string ExportToExcel(DataGridView grid, string sheetName = "result", string filePath = null)
-    {
-        if (grid.Rows.Count <= 0) return null;
-
-        if (string.IsNullOrEmpty(filePath))
-        {
-            filePath = GetSaveFilePath();
-        }
-
-        if (string.IsNullOrEmpty(filePath)) return null;
-
-        bool isCompatible = GetIsCompatible(filePath);
-
-        IWorkbook workbook = CreateWorkbook(isCompatible);
-        ICellStyle cellStyle = GetCellStyle(workbook);
-        ISheet sheet = workbook.CreateSheet(sheetName);
-
-        IRow headerRow = sheet.CreateRow(0);
-
-        for (int i = 0; i < grid.Columns.Count; i++)
-        {
-            ICell cell = headerRow.CreateCell(i);
-            cell.SetCellValue(grid.Columns[i].HeaderText);
-            cell.CellStyle = cellStyle;
-        }
-
-        int rowIndex = 1;
-        foreach (DataGridViewRow row in grid.Rows)
-        {
-            IRow dataRow = sheet.CreateRow(rowIndex);
-            for (int n = 0; n < grid.Columns.Count; n++)
-            {
-                dataRow.CreateCell(n).SetCellValue((row.Cells[n].Value ?? "").ToString());
-            }
-            rowIndex++;
-        }
-
-        FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        workbook.Write(fs);
-        fs.Dispose();
-
-        sheet = null;
-        headerRow = null;
-        workbook = null;
-
-        return filePath;
-    }
-
-    #endregion
-
-    #region 公共导入方法
-
-    /// <summary>
-    /// 由Excel导入DataTable
-    /// </summary>
-    /// <param name="excelFileStream">Excel文件流</param>
-    /// <param name="sheetName">Excel工作表名称</param>
-    /// <param name="headerRowIndex">Excel表头行索引</param>
-    /// <param name="isCompatible">是否为兼容模式</param>
-    /// <returns>DataTable</returns>
-    public static DataTable ImportFromExcel(Stream excelFileStream, string sheetName, int headerRowIndex, bool isCompatible)
-    {
-        IWorkbook workbook = CreateWorkbook(isCompatible, excelFileStream);
-        ISheet sheet = null;
-        int sheetIndex = -1;
-        if (int.TryParse(sheetName, out sheetIndex))
-        {
-            sheet = workbook.GetSheetAt(sheetIndex);
-        }
-        else
-        {
-            sheet = workbook.GetSheet(sheetName);
-        }
-
-        DataTable table = GetDataTableFromSheet(sheet, headerRowIndex);
-
-        excelFileStream.Close();
-        workbook = null;
-        sheet = null;
-        return table;
-    }
-
-    /// <summary>
-    /// 由Excel导入DataTable
-    /// </summary>
-    /// <param name="excelFilePath">Excel文件路径，为物理路径。</param>
-    /// <param name="sheetName">Excel工作表名称</param>
-    /// <param name="headerRowIndex">Excel表头行索引</param>
-    /// <returns>DataTable</returns>
-    public static DataTable ImportFromExcel(string excelFilePath, string sheetName, int headerRowIndex)
-    {
-        if (string.IsNullOrEmpty(excelFilePath))
-        {
-            excelFilePath = GetOpenFilePath();
-        }
-
-        if (string.IsNullOrEmpty(excelFilePath))
-        {
-            return null;
-        }
-
-        using (FileStream stream = System.IO.File.OpenRead(excelFilePath))
-        {
-            bool isCompatible = GetIsCompatible(excelFilePath);
-            return ImportFromExcel(stream, sheetName, headerRowIndex, isCompatible);
-        }
-    }
-
-    /// <summary>
-    /// 由Excel导入DataSet，如果有多个工作表，则导入多个DataTable
-    /// </summary>
-    /// <param name="excelFileStream">Excel文件流</param>
-    /// <param name="headerRowIndex">Excel表头行索引</param>
-    /// <param name="isCompatible">是否为兼容模式</param>
-    /// <returns>DataSet</returns>
-    public static DataSet ImportFromExcel(Stream excelFileStream, int headerRowIndex, bool isCompatible)
-    {
-        DataSet ds = new DataSet();
-        IWorkbook workbook = CreateWorkbook(isCompatible, excelFileStream);
-        for (int i = 0; i < workbook.NumberOfSheets; i++)
-        {
-            ISheet sheet = workbook.GetSheetAt(i);
-            DataTable table = GetDataTableFromSheet(sheet, headerRowIndex);
-            ds.Tables.Add(table);
-        }
-
-        excelFileStream.Close();
-        workbook = null;
-
-        return ds;
-    }
-
-    /// <summary>
-    /// 由Excel导入DataSet，如果有多个工作表，则导入多个DataTable
-    /// </summary>
-    /// <param name="excelFilePath">Excel文件路径，为物理路径。</param>
-    /// <param name="headerRowIndex">Excel表头行索引</param>
-    /// <returns>DataSet</returns>
     public static DataSet ImportFromExcel(string excelFilePath, int headerRowIndex)
     {
         if (string.IsNullOrEmpty(excelFilePath))
         {
             excelFilePath = GetOpenFilePath();
         }
-
         if (string.IsNullOrEmpty(excelFilePath))
         {
             return null;
         }
-
-        using (FileStream stream = System.IO.File.OpenRead(excelFilePath))
+        using (FileStream stream = File.OpenRead(excelFilePath))
         {
             bool isCompatible = GetIsCompatible(excelFilePath);
             return ImportFromExcel(stream, headerRowIndex, isCompatible);
         }
     }
 
-    #endregion
-
-    #region 公共转换方法
-
-    /// <summary>
-    /// 将Excel的列索引转换为列名，列索引从0开始，列名从A开始。如第0列为A，第1列为B...
-    /// </summary>
-    /// <param name="index">列索引</param>
-    /// <returns>列名，如第0列为A，第1列为B...</returns>
-    public static string ConvertColumnIndexToColumnName(int index)
+    public static DataSet ImportFromExcel(Stream excelFileStream, int headerRowIndex, bool isCompatible)
     {
-        index = index + 1;
-        int system = 26;
-        char[] digArray = new char[100];
-        int i = 0;
-        while (index > 0)
+        DataSet set = new DataSet();
+        IWorkbook workbook = CreateWorkbook(isCompatible, excelFileStream);
+        for (int i = 0; i < workbook.NumberOfSheets; i++)
         {
-            int mod = index % system;
-            if (mod == 0) mod = system;
-            digArray[i++] = (char)(mod - 1 + 'A');
-            index = (index - 1) / 26;
+            DataTable dataTableFromSheet = GetDataTableFromSheet(workbook.GetSheetAt(i), headerRowIndex);
+            set.Tables.Add(dataTableFromSheet);
         }
-        StringBuilder sb = new StringBuilder(i);
-        for (int j = i - 1; j >= 0; j--)
-        {
-            sb.Append(digArray[j]);
-        }
-        return sb.ToString();
+        excelFileStream.Close();
+        workbook = null;
+        return set;
     }
 
-
-    /// <summary>
-    /// 转化日期
-    /// </summary>
-    /// <param name="date">日期</param>
-    /// <returns></returns>
-    public static DateTime ConvertToDate(object date)
+    public static DataTable ImportFromExcel(string excelFilePath, string sheetName, int headerRowIndex)
     {
-        string dtStr = (date ?? "").ToString();
-
-        DateTime dt = new DateTime();
-
-        if (DateTime.TryParse(dtStr, out dt))
+        if (string.IsNullOrEmpty(excelFilePath))
         {
-            return dt;
+            excelFilePath = GetOpenFilePath();
         }
-
-        try
+        if (string.IsNullOrEmpty(excelFilePath))
         {
-            string spStr = "";
-            if (dtStr.Contains("-"))
-            {
-                spStr = "-";
-            }
-            else if (dtStr.Contains("/"))
-            {
-                spStr = "/";
-            }
-            string[] time = dtStr.Split(spStr.ToCharArray());
-            int year = Convert.ToInt32(time[2]);
-            int month = Convert.ToInt32(time[0]);
-            int day = Convert.ToInt32(time[1]);
-            string years = Convert.ToString(year);
-            string months = Convert.ToString(month);
-            string days = Convert.ToString(day);
-            if (months.Length == 4)
-            {
-                dt = Convert.ToDateTime(date);
-            }
-            else
-            {
-                string rq = "";
-                if (years.Length == 1)
-                {
-                    years = "0" + years;
-                }
-                if (months.Length == 1)
-                {
-                    months = "0" + months;
-                }
-                if (days.Length == 1)
-                {
-                    days = "0" + days;
-                }
-                rq = "20" + years + "-" + months + "-" + days;
-                dt = Convert.ToDateTime(rq);
-            }
+            return null;
         }
-        catch
+        using (FileStream stream = File.OpenRead(excelFilePath))
         {
-            throw new Exception("日期格式不正确，转换日期类型失败！");
+            bool isCompatible = GetIsCompatible(excelFilePath);
+            return ImportFromExcel(stream, sheetName, headerRowIndex, isCompatible);
         }
-        return dt;
     }
 
-    /// <summary>
-    /// 转化数字
-    /// </summary>
-    /// <param name="d">数字字符串</param>
-    /// <returns></returns>
-    public static decimal ConvertToDecimal(object d)
+    public static DataTable ImportFromExcel(Stream excelFileStream, string sheetName, int headerRowIndex, bool isCompatible)
     {
-        string dStr = (d ?? "").ToString();
-        decimal result = 0;
-        if (decimal.TryParse(dStr, out result))
+        IWorkbook workbook = CreateWorkbook(isCompatible, excelFileStream);
+        ISheet sheetAt = null;
+        int result = -1;
+        if (int.TryParse(sheetName, out result))
         {
-            return result;
+            sheetAt = workbook.GetSheetAt(result);
         }
         else
         {
-            throw new Exception("数字格式不正确，转换数字类型失败！");
+            sheetAt = workbook.GetSheet(sheetName);
         }
-
+        DataTable dataTableFromSheet = GetDataTableFromSheet(sheetAt, headerRowIndex);
+        excelFileStream.Close();
+        workbook = null;
+        sheetAt = null;
+        return dataTableFromSheet;
     }
-
-
-    /// <summary>
-    /// 转化布尔
-    /// </summary>
-    /// <param name="b"></param>
-    /// <returns></returns>
-    public static bool ConvertToBoolen(object b)
-    {
-        string bStr = (b ?? "").ToString().Trim();
-        bool result = false;
-        if (bool.TryParse(bStr, out result))
-        {
-            return result;
-        }
-        else if (bStr == "0" || bStr == "1")
-        {
-            return (bStr == "0");
-        }
-        else
-        {
-            throw new Exception("布尔格式不正确，转换布尔类型失败！");
-        }
-    }
-
-    #endregion
-
-
 }
 
